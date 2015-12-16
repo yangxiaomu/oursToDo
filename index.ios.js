@@ -9,6 +9,8 @@ var Navigation = require('./ios_views/common/navigation');
 var GroupToDo = require('./ios_views/group/group_list');
 var Summary = require('./ios_views/summary/sum_list');
 
+var Icon = require("react-native-vector-icons/FontAwesome");
+
 var {
   AppRegistry,
   StyleSheet,
@@ -31,29 +33,33 @@ var oursToDo = React.createClass({
   render: function() {
     return (
       <TabBarIOS>
-        <TabBarIOS.Item
+
+        <Icon.TabBarItem
           title="todo列表"
-          selected={this.state.selectedTab === 'GroupToDo'}
-          // icon={require('./img/icon_group_todo.jpg')}
+          iconName="dribbble"
+          selectedIconName="dribbble"
+          selected={this.state.selectedTab === "GroupToDo"}
           onPress={() => {
             this.setState({
               selectedTab: 'GroupToDo'
             });
           }}>
           <Navigation component={GroupToDo}/>
-        </TabBarIOS.Item>
+        </Icon.TabBarItem>
 
-        <TabBarIOS.Item 
+        <Icon.TabBarItem
           title="统计"
+          iconName="lightbulb-o"
+          selectedIconName="lightbulb-o"
           selected={this.state.selectedTab === 'Summary'}
-          // icon={require('./img/icon_summary.png')}
           onPress={() => {
             this.setState({
               selectedTab: 'Summary'
             });
           }}>          
           <Navigation component={Summary}/>
-        </TabBarIOS.Item>
+        </Icon.TabBarItem>
+        
       </TabBarIOS>
 
     );
