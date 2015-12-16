@@ -1,6 +1,6 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * oursToDo
+ * https://github.com/yangxiaomu/oursToDo.git
  */
 'use strict';
 
