@@ -1,12 +1,12 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
+ * 组织列表
+ * https://github.com/wuqinlong/oursToDo.git
  */
 'use strict';
 
 var React = require('react-native');
-// var GroupToDO = require('./ios_views/group_list');
-// var Summary = require('./ios_views/sum_list');
+var TodoList = require('./todo_list');
+var AddToDo = require('./add_todo');
 
 var API_KEY = '7waqfqbprs7pajbz28mqf6vz';
 var API_URL = 'http://api.rottentomatoes.com/api/public/v1.0/lists/movies/in_theaters.json';
@@ -40,10 +40,15 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function() {
-    // this.fetchData();
+    // this.getGroupByAPI();
     this.getGroup();
   },
-  fetchData: function() {
+  
+  /**
+   * 从smartDB restAPI获取组织列表
+   * added by ql_wu
+   */
+  getGroupByAPI: function() {
     var _data=MOVE_RETURN;
     fetch(REQUEST_URL)
       .then((response) => response.json())
@@ -55,7 +60,11 @@ module.exports = React.createClass({
       })
       .done();
   },
-
+  
+  /**
+   * 获取组织列表，假数据，开发测试用
+   * added by ql_wu
+   */
   getGroup: function(){
     var _data=GROUP_LIST;
     this.setState({dataSource: this.state.dataSource.cloneWithRows(_data.groups),
@@ -71,7 +80,7 @@ module.exports = React.createClass({
       
       <View>
         <View>
-        <Text style={styles.add}>+</Text>
+        <Text style={styles.add}  onPress={this.addToDoPage}>+</Text>
         </View>
         <View>
           <ListView
@@ -83,7 +92,11 @@ module.exports = React.createClass({
       </View>
     );
   },
-
+  
+  /**
+   * 数据等待画面
+   * added by ql_wu
+   */
   renderLoadingView: function() {
     return (
       <View style={styles.container}>
@@ -94,8 +107,34 @@ module.exports = React.createClass({
     );
   },
 
+  /**
+   * 跳转：组织下todo list画面
+   * added by ql_wu
+   */
+  todoListPage: function(id){
+    this.props.navigator.push({
+      component: TodoList,
+      passProps:{
+        id: id
+      }
+    });
+  },
+
+  /**
+   * 跳转：新增todo画面
+   * added by ql_wu
+   */
+  addToDoPage:function(){
+    this.props.navigator.push({
+      component: AddToDo,
+    });
+  },
+  
+  /**
+   * 绘制group
+   * added by ql_wu
+   */
   renderGroup: function(group) {
-    var path = 'localhost:/Users/dac/project/oursToDo/img/icon_group_todo.jpg';
     return (
       <View style={styles.container}>
         <Image
@@ -103,7 +142,7 @@ module.exports = React.createClass({
           style={styles.thumbnail}
         />
         <View style={styles.rightContainer}>
-          <Text style={styles.title}>{group.name}</Text>
+          <Text style={styles.title} onPress={this.todoListPage.bind(this,group.id)}>{group.name}</Text>
         </View>
       </View>
     );

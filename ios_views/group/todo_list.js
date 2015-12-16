@@ -1,5 +1,5 @@
 /**
- * 统计列表
+ * todo列表
  * https://github.com/wuqinlong/oursToDo.git
  */
 'use strict';
@@ -18,7 +18,7 @@ module.exports = React.createClass({
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
-          统计列表!
+          todo列表!
         </Text>
       </View>
     );
