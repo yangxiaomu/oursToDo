@@ -5,6 +5,7 @@
 'use strict';
 
 var React = require('react-native');
+var Header = require('./../common/header');
 
 var {
   AppRegistry,
@@ -16,10 +17,18 @@ var {
 module.exports = React.createClass({
   render: function() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          todo列表!
-        </Text>
+      <View>
+        <Header
+          navigator={this.props.navigator}
+          initObj={{
+              backName: '组织',
+              title: ''
+        }}/>
+        <View style={styles.container}>
+          <Text style={styles.welcome}>
+            todo列表!
+          </Text>
+        </View>
       </View>
     );
   }
