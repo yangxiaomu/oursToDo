@@ -1,2 +1,2 @@
-# OurThing
+# oursToDo
 Team todo app
