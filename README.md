@@ -2,6 +2,8 @@
 Team todo app
 developed on react-native
 
+trello: https://trello.com/b/F7LTPM9C/ourstodo
+
 引用第三方矢量图标库：
 https://github.com/oblador/react-native-vector-icons
 
