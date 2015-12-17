@@ -18,6 +18,14 @@ var GROUP_LIST={"groups":[
   {id:'1',name:'suzuken',icon:'suzuken.png'}
   ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
   ,{id:'3',name:'NHK',icon:'nhk.png'}
+  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
+  ,{id:'5',name:'ICO',icon:'nhk.png'}
+  ,{id:'6',name:'devOps',icon:'nhk.png'}
+  ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
+  ,{id:'3',name:'NHK',icon:'nhk.png'}
+  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
+  ,{id:'5',name:'ICO',icon:'nhk.png'}
+  ,{id:'6',name:'devOps',icon:'nhk.png'}
 ]};
 
 var {

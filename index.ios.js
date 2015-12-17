@@ -6,8 +6,8 @@
 
 var React = require('react-native');
 var Navigation = require('./ios_views/common/navigation');
-var GroupToDo = require('./ios_views/group/group_list');
-var Summary = require('./ios_views/summary/sum_list');
+var GroupToDo = require('./ios_views/group/todo_group_list');
+var Summary = require('./ios_views/summary/sum_group_list');
 
 var Icon = require("react-native-vector-icons/FontAwesome");
 
@@ -35,7 +35,7 @@ var oursToDo = React.createClass({
       <TabBarIOS>
 
         <Icon.TabBarItem
-          title="todo列表"
+          title=""
           iconName="dribbble"
           selectedIconName="dribbble"
           selected={this.state.selectedTab === "GroupToDo"}
@@ -48,7 +48,7 @@ var oursToDo = React.createClass({
         </Icon.TabBarItem>
 
         <Icon.TabBarItem
-          title="统计"
+          title=""
           iconName="lightbulb-o"
           selectedIconName="lightbulb-o"
           selected={this.state.selectedTab === 'Summary'}
