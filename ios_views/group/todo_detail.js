@@ -18,12 +18,6 @@ module.exports = React.createClass({
   render: function() {
     return (
       <View>
-        <Header
-          navigator={this.props.navigator}
-          initObj={{
-              backName: '组织',
-              title: ''
-        }}/>
         <View style={styles.container}>
           <Text style={styles.welcome}>
             todo详细!
@@ -40,6 +34,7 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
+    marginTop:44,
   },
   welcome: {
     fontSize: 20,

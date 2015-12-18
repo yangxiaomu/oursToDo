@@ -45,6 +45,9 @@ var oursToDo = React.createClass({
       return (
         <NavigatorIOS style={styles.wrapper}
           ref="nav"
+          tintColor='#DA552F'
+          barTintColor='#FFFFFD'
+          titleTextColor='#DA552F'
           initialRoute={{
             component: this.state.selectedTab,
             title: title,
@@ -106,7 +109,7 @@ var oursToDo = React.createClass({
 
 var styles = StyleSheet.create({
   wrapper: {
-    flex: 1
+    flex: 1,
   }
 });
 

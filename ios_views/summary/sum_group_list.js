@@ -80,9 +80,6 @@ module.exports = React.createClass({
     return (
       <View>
         <View>
-        <Text style={styles.add} ></Text>
-        </View>
-        <View>
           <ListView
             dataSource={this.state.dataSource}
             renderRow={this.renderGroup}

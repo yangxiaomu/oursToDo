@@ -7,6 +7,8 @@
 var React = require('react-native');
 var TodoList = require('./todo_list');
 var AddToDo = require('./add_todo');
+var Icon = require("react-native-vector-icons/FontAwesome");
+
 
 var API_KEY = '7waqfqbprs7pajbz28mqf6vz';
 var API_URL = 'http://api.rottentomatoes.com/api/public/v1.0/lists/movies/in_theaters.json';
@@ -35,6 +37,8 @@ var {
   Text,
   View,
   ListView,
+  TextInput,
+  AlertIOS,
 } = React;
 
 module.exports = React.createClass({
@@ -85,14 +89,17 @@ module.exports = React.createClass({
     }
 
     return (
-      <View>
-        <View>
-          <ListView
-            dataSource={this.state.dataSource}
-            renderRow={this.renderGroup}
-            style={styles.listView}
-          />
-        </View>
+      <View style={styles.listContainer}>
+        <TextInput
+          style={{marginTop:44,height: 40, borderColor: 'gray', borderWidth: 1}}
+          onChangeText={(text) => this.setState({input: text})}
+        />
+
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderGroup}
+          style={styles.listView}
+        />
       </View>
     );
   },
@@ -117,8 +124,21 @@ module.exports = React.createClass({
    */
   todoListPage: function(id){
     this.props.navigator.push({
+      title: 'ICO',
       component: TodoList,
-      passProps:{
+      //leftButtonTitle: 'Custom Left',
+      onLeftButtonPress: () => this.props.navigator.pop(),
+      //rightButtonIcon: ,
+      rightButtonTitle: 'New',
+      onRightButtonPress: () => this.props.navigator.push({
+        title: 'NewTodo',
+        component: AddToDo,
+        //leftButtonTitle: 'Custom Left',
+        onLeftButtonPress: () => this.props.navigator.pop(),
+      
+      }),
+      passProps: {
+        text: 'This page has an icon for the right button in the nav bar',
         id: id
       }
     });
@@ -130,6 +150,7 @@ module.exports = React.createClass({
    */
   addToDoPage:function(){
     this.props.navigator.push({
+      title: 'AddToDo',
       component: AddToDo,
     });
   },
@@ -177,14 +198,22 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  add: {
-    fontSize: 20,
-    textAlign: 'right',
-    margin: 10,
-    backgroundColor: 'yellow',
-  },
   thumbnail : {
     width: 53,
     height: 53,
+  },
+  searchRow: {
+    backgroundColor: '#eeeeee',
+    paddingTop: 75,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom: 10,
+  },
+  searchTextInput: {
+    backgroundColor: 'white',
+    borderColor: '#cccccc',
+    borderRadius: 3,
+    borderWidth: 1,
+    paddingLeft: 8,
   },
 });
