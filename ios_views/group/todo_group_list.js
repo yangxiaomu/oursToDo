@@ -1,15 +1,28 @@
 /**
- * todo列表
+ * 组织列表
  * https://github.com/yangxiaomu/oursToDo.git
  */
 'use strict';
 
 var React = require('react-native');
-var Header = require('./../common/header');
-var todoDetail = require('./todo_detail');
+var TodoList = require('./todo_list');
+var AddToDo = require('./add_todo');
+var Icon = require("react-native-vector-icons/FontAwesome");
+
+
+var API_KEY = '7waqfqbprs7pajbz28mqf6vz';
+var API_URL = 'http://api.rottentomatoes.com/api/public/v1.0/lists/movies/in_theaters.json';
+var PAGE_SIZE = 25;
+var PARAMS = '?apikey=' + API_KEY + '&page_limit=' + PAGE_SIZE;
+var REQUEST_URL = API_URL + PARAMS;
 
 var GROUP_LIST={"groups":[
   {id:'1',name:'suzuken',icon:'suzuken.png'}
+  ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
+  ,{id:'3',name:'NHK',icon:'nhk.png'}
+  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
+  ,{id:'5',name:'ICO',icon:'nhk.png'}
+  ,{id:'6',name:'devOps',icon:'nhk.png'}
   ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
   ,{id:'3',name:'NHK',icon:'nhk.png'}
   ,{id:'4',name:'SmartDB',icon:'nhk.png'}
@@ -28,7 +41,7 @@ var {
   AlertIOS,
 } = React;
 
-var todoList= React.createClass({
+module.exports = React.createClass({
   getInitialState: function() {
     return {
       dataSource: new ListView.DataSource({
@@ -112,9 +125,18 @@ var todoList= React.createClass({
   todoListPage: function(id){
     this.props.navigator.push({
       title: 'ICO',
-      component: todoDetail,
+      component: TodoList,
       //leftButtonTitle: 'Custom Left',
       onLeftButtonPress: () => this.props.navigator.pop(),
+      //rightButtonIcon: ,
+      rightButtonTitle: 'New',
+      onRightButtonPress: () => this.props.navigator.push({
+        title: 'NewTodo',
+        component: AddToDo,
+        //leftButtonTitle: 'Custom Left',
+        onLeftButtonPress: () => this.props.navigator.pop(),
+      
+      }),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',
         id: id
@@ -195,7 +217,3 @@ var styles = StyleSheet.create({
     paddingLeft: 8,
   },
 });
-
-module.exports = todoList;
-
-

@@ -5,19 +5,20 @@
 'use strict';
 
 var React = require('react-native');
-var TodoList = require('./todo_list');
-var AddToDo = require('./add_todo');
-
-var API_KEY = '7waqfqbprs7pajbz28mqf6vz';
-var API_URL = 'http://api.rottentomatoes.com/api/public/v1.0/lists/movies/in_theaters.json';
-var PAGE_SIZE = 25;
-var PARAMS = '?apikey=' + API_KEY + '&page_limit=' + PAGE_SIZE;
-var REQUEST_URL = API_URL + PARAMS;
+var SumList = require('./sum_list');
 
 var GROUP_LIST={"groups":[
   {id:'1',name:'suzuken',icon:'suzuken.png'}
   ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
   ,{id:'3',name:'NHK',icon:'nhk.png'}
+  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
+  ,{id:'5',name:'ICO',icon:'nhk.png'}
+  ,{id:'6',name:'devOps',icon:'nhk.png'}
+  ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
+  ,{id:'3',name:'NHK',icon:'nhk.png'}
+  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
+  ,{id:'5',name:'ICO',icon:'nhk.png'}
+  ,{id:'6',name:'devOps',icon:'nhk.png'}
 ]};
 
 var {
@@ -77,11 +78,7 @@ module.exports = React.createClass({
     }
 
     return (
-      
       <View>
-        <View>
-        <Text style={styles.add}  onPress={this.addToDoPage}>+</Text>
-        </View>
         <View>
           <ListView
             dataSource={this.state.dataSource}
@@ -113,23 +110,13 @@ module.exports = React.createClass({
    */
   todoListPage: function(id){
     this.props.navigator.push({
-      component: TodoList,
+      component: SumList,
       passProps:{
         id: id
       }
     });
   },
 
-  /**
-   * 跳转：新增todo画面
-   * added by ql_wu
-   */
-  addToDoPage:function(){
-    this.props.navigator.push({
-      component: AddToDo,
-    });
-  },
-  
   /**
    * 绘制group
    * added by ql_wu

@@ -1,5 +1,5 @@
 /**
- * todo详细
+ * 统计详细
  * https://github.com/yangxiaomu/oursToDo.git
  */
 'use strict';
@@ -12,34 +12,36 @@ var {
   StyleSheet,
   Text,
   View,
+  Image,
 } = React;
 
 module.exports = React.createClass({
   render: function() {
     return (
       <View>
-        <View style={styles.container}>
-          <Text style={styles.welcome}>
-            todo详细!
-          </Text>
-        </View>
+        <Text style={styles.welcome}>
+          add_group!
+        </Text>
       </View>
     );
   }
 });
 
 var styles = StyleSheet.create({
+  summary_demo : {
+    width: 200,
+    height: 200,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
-    marginTop:44,
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
-    margin: 10,
+    margin: 100,
   },
   instructions: {
     textAlign: 'center',
