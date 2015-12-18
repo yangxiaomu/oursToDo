@@ -9,14 +9,16 @@ var {
   View,
   Text,
   TextInput,
-  Image
+  Image,
+  AlertIOS,
+  TouchableHighlight
 } = React;
 
 var login = React.createClass({
   getInitialState: function() {
     return {
-      username: '',
-      password: ''
+      user_code: '',
+      user_pass: ''
     }
   },
   render: function() {
@@ -24,7 +26,7 @@ var login = React.createClass({
         <View style={styles.container}>
             <Image style={styles.bg} source={{uri: 'http://i.imgur.com/xlQ56UK.jpg'}} />
             <View style={styles.header}>
-                <Image style={styles.mark} source={require('../../img/icon.png')} />
+                <Image style={styles.mark} source={require('./img/icon.png')} />
             </View>
             <View style={styles.inputs}>
                 <View style={styles.inputContainer}>
@@ -33,7 +35,8 @@ var login = React.createClass({
                         style={[styles.input, styles.whiteFont]}
                         placeholder="Username"
                         placeholderTextColor="#FFF"
-                        value={this.state.username}
+                        value={this.state.user_code}
+                        onChangeText={(text) => this.setState({user_code: text})}
                     />
                 </View>
                 <View style={styles.inputContainer}>
@@ -43,20 +46,88 @@ var login = React.createClass({
                         style={[styles.input, styles.whiteFont]}
                         placeholder="Pasword"
                         placeholderTextColor="#FFF"
-                        value={this.state.password}
+                        value={this.state.user_pass}
+                        onChangeText={(text) => this.setState({user_pass: text})}
                     />
                 </View>
             </View>
-            <View style={styles.signin}>
-                <Text style={styles.whiteFont}>Sign In</Text>
-            </View>
+            <TouchableHighlight onPress={this.login}>
+              <View style={styles.signin}>
+                  <Text style={styles.whiteFont}>Sign In</Text>
+              </View>
+            </TouchableHighlight>
             <View style={styles.signup}>
                 <Text style={styles.greyFont}>Welcome To OursToDo</Text>
             </View>
         </View>
     );
+  },
+
+  login: function() {
+    var user_code = this.state.user_code;
+    var user_pass = this.state.user_pass;
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          if (parseInt(result.totalCount) > 0) {
+            AlertIOS.alert("ログイン成功！")
+          } else {
+            AlertIOS.alert("ユーザー・パスワードが無効！")
+          }
+
+        }
+      }
+    ).catch(function(err) {
+      AlertIOS.alert("システムエラー！");
+    });
   }
+
 });
+
+function make_base_auth(user, password) {
+  var tok = base64_encode(user + ":" + password);
+  return "Basic " + tok;
+}
+
+function base64_encode(str){
+  var c1, c2, c3;
+  var base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";                
+  var i = 0, len= str.length, string = '';
+
+  while (i < len){
+    c1 = str.charCodeAt(i++) & 0xff;
+    if (i == len){
+      string += base64EncodeChars.charAt(c1 >> 2);
+      string += base64EncodeChars.charAt((c1 & 0x3) << 4);
+      string += "==";
+      break;
+    }
+    c2 = str.charCodeAt(i++);
+    if (i == len){
+      string += base64EncodeChars.charAt(c1 >> 2);
+      string += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
+      string += base64EncodeChars.charAt((c2 & 0xF) << 2);
+      string += "=";
+            break;
+    }
+    c3 = str.charCodeAt(i++);
+    string += base64EncodeChars.charAt(c1 >> 2);
+    string += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
+    string += base64EncodeChars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >> 6));
+    string += base64EncodeChars.charAt(c3 & 0x3F)
+  }
+  return string;
+}
 
 var styles = StyleSheet.create({
     container: {
