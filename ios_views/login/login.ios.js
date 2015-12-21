@@ -68,7 +68,10 @@ var login = React.createClass({
     var user_code = this.state.user_code;
     var user_pass = this.state.user_pass;
     var temp = this;
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
+    if(user_code == "" || user_pass == "") {
+      AlertIOS.alert("ユーザー・パスワードをご入力ください。");
+    } else {
+      fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -100,6 +103,8 @@ var login = React.createClass({
         temp.state.user_pass = '';
       }
     });
+    }
+    
   }
 });
 
