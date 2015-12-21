@@ -11,20 +11,25 @@ var {
   AppRegistry,
   StyleSheet,
   View,
-  NavigatorIOS
+  Navigator
 } = React;
 
 var oursToDo = React.createClass({
   
   render: function() {
     return (
-      <NavigatorIOS style={styles.wrapper}
-        navigationBarHidden={true}
-        initialRoute={{
-          component: login,
-          title: 'login',
-          //passProps: { myProp: 'foo' },
-        }}
+      
+      <Navigator
+          initialRoute={{ name: login, component: login }}
+          configureScene={() => {
+            return Navigator.SceneConfigs.VerticalDownSwipeJump;
+          }}
+          renderScene={(route, navigator) => {
+            let Component = route.component;
+            if(route.component) {
+              return <Component {...route.params} navigator={navigator} />
+            }
+          }} 
       />
     );
   },
