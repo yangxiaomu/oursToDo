@@ -29,8 +29,7 @@ var {
 StatusBarIOS.setHidden(true);
 var home = React.createClass({
   getInitialState: function(){
-    //AlertIOS.alert(this.prop.user_code)
-    
+    //AlertIOS.alert(this.prop.user_code)    
     return {
       selectedTab: GroupToDo
     };

@@ -39,6 +39,7 @@ var {
   ListView,
   TextInput,
   AlertIOS,
+  Navigator,
 } = React;
 
 module.exports = React.createClass({
@@ -130,12 +131,13 @@ module.exports = React.createClass({
       onLeftButtonPress: () => this.props.navigator.pop(),
       //rightButtonIcon: ,
       rightButtonTitle: 'New',
+
       onRightButtonPress: () => this.props.navigator.push({
         title: 'NewTodo',
         component: AddToDo,
         //leftButtonTitle: 'Custom Left',
         onLeftButtonPress: () => this.props.navigator.pop(),
-      
+
       }),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',

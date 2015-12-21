@@ -2,25 +2,17 @@
  * oursToDo
  * https://github.com/yangxiaomu/oursToDo.git
  */
-'use strict';
 
+'use strict';
 var React = require('react-native');
 var login = require('./ios_views/login/login.ios');
-
 
 var {
   AppRegistry,
   StyleSheet,
-  Text,
   View,
-  TabBarIOS,
-  Navigator,
-  ScrollView,
-  NavigatorIOS,
-  StatusBarIOS
 } = React;
 
-StatusBarIOS.setHidden(true);
 var oursToDo = React.createClass({
   
   render: function() {
