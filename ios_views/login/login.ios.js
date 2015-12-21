@@ -3,6 +3,9 @@ var React = require('react-native');
 var Dimensions = require('Dimensions');
 var windowSize = Dimensions.get('window');
 
+var home = require('./../common/home');
+
+
 var {
   AppRegistry,
   StyleSheet,
@@ -26,7 +29,7 @@ var login = React.createClass({
         <View style={styles.container}>
             <Image style={styles.bg} source={{uri: 'http://i.imgur.com/xlQ56UK.jpg'}} />
             <View style={styles.header}>
-                <Image style={styles.mark} source={require('./img/icon.png')} />
+                <Image style={styles.mark} source={require('./../../img/icon.png')} />
             </View>
             <View style={styles.inputs}>
                 <View style={styles.inputContainer}>
@@ -66,32 +69,40 @@ var login = React.createClass({
   login: function() {
     var user_code = this.state.user_code;
     var user_pass = this.state.user_pass;
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
-      headers:{
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': make_base_auth('b_wang', 'b_wang')
-      }
-    }).then(
-      function(response) {
-        if (response.status === 401) {
-          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
-        }
-        if (response.status === 200) {
-          var result = JSON.parse(response._bodyText);
-          if (parseInt(result.totalCount) > 0) {
-            AlertIOS.alert("ログイン成功！")
-          } else {
-            AlertIOS.alert("ユーザー・パスワードが無効！")
-          }
+    var temp = this;
+    // fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
+    //   headers:{
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //     'Authorization': make_base_auth('b_wang', 'b_wang')
+    //   }
+    // }).then(
+    //   function(response) {
+    //     if (response.status === 401) {
+    //       AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+    //     }
+    //     if (response.status === 200) {
+    //       var result = JSON.parse(response._bodyText);
+    //       if (parseInt(result.totalCount) > 0) {
+    //         this.props.navigator.push({
+    //           title: 'Summary',
+    //           component: Summary,
+    //         });
+    //         //temp.login_seccess;
+    //         //AlertIOS.alert("ログイン成功！")
+    //       } else {
+    //         AlertIOS.alert("ユーザー・パスワードが無効！")
+    //       }
 
-        }
-      }
-    ).catch(function(err) {
-      AlertIOS.alert("システムエラー！");
+    //     }
+    //   }
+    // ).catch(function(err) {
+    //   AlertIOS.alert("システムエラー！");
+    // });
+    this.props.navigator.resetTo({
+      component: home,
     });
   }
-
 });
 
 function make_base_auth(user, password) {

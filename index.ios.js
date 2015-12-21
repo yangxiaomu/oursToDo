@@ -5,12 +5,7 @@
 'use strict';
 
 var React = require('react-native');
-var Navigation = require('./ios_views/common/navigation');
-var GroupToDo = require('./ios_views/group/todo_group_list');
-var Summary = require('./ios_views/summary/sum_group_list');
-var addGroup = require('./ios_views/group/add_group');
-
-var Icon = require("react-native-vector-icons/FontAwesome");
+var login = require('./ios_views/login/login.ios');
 
 
 var {
@@ -27,84 +22,19 @@ var {
 
 StatusBarIOS.setHidden(true);
 var oursToDo = React.createClass({
-  getInitialState: function(){
-    return {
-      selectedTab: GroupToDo
-    };
-  },
-
-  onRightButtonPress: function() {
-    this.refs.nav.push({
-      title: 'addGroup',
-      component: addGroup
-    })
-  },
-
-  _renderContent: function(category: string, title: ?string) {
-    if (title == "GroupToDo") {
-      return (
-        <NavigatorIOS style={styles.wrapper}
-          ref="nav"
-          tintColor='#DA552F'
-          barTintColor='#FFFFFD'
-          titleTextColor='#DA552F'
-          initialRoute={{
-            component: this.state.selectedTab,
-            title: title,
-            passProps: {filter: category},
-            rightButtonTitle: "➕",
-            onRightButtonPress: this.onRightButtonPress
-          }}
-        />
-      );
-    } else {
-      return (
-        <NavigatorIOS style={styles.wrapper}
-          initialRoute={{
-            component: this.state.selectedTab,
-            title: title,
-            passProps: {filter: category}
-          }}
-        />
-      );
-    }
-  },
-
+  
   render: function() {
     return (
-      <TabBarIOS tintColor={"#ea4c89"}>
-
-        <Icon.TabBarItem
-          title="todo列表"
-          iconName="dribbble"
-          selectedIconName="dribbble"
-          selected={this.state.selectedTab == GroupToDo}
-          onPress={() => {
-            this.setState({
-              selectedTab: GroupToDo
-            });
-          }}>
-          {this._renderContent("GroupToDo", "GroupToDo")}
-
-        </Icon.TabBarItem>
-
-        <Icon.TabBarItem
-          title="统计"
-          iconName="lightbulb-o"
-          selectedIconName="lightbulb-o"
-          selected={this.state.selectedTab == Summary}
-          onPress={() => {
-            this.setState({
-              selectedTab: Summary
-            });
-          }}>
-          {this._renderContent("Summary", "Summary")}
-        </Icon.TabBarItem>
-        
-      </TabBarIOS>
-
+      <NavigatorIOS style={styles.wrapper}
+        navigationBarHidden={true}
+        initialRoute={{
+          component: login,
+          title: 'login',
+          //passProps: { myProp: 'foo' },
+        }}
+      />
     );
-  }
+  },
 });
 
 var styles = StyleSheet.create({
