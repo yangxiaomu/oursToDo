@@ -11,6 +11,7 @@ var {
   AppRegistry,
   StyleSheet,
   View,
+  NavigatorIOS
 } = React;
 
 var oursToDo = React.createClass({

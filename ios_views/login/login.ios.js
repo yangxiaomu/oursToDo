@@ -2,9 +2,7 @@
 var React = require('react-native');
 var Dimensions = require('Dimensions');
 var windowSize = Dimensions.get('window');
-
 var home = require('./../common/home');
-
 
 var {
   AppRegistry,
@@ -70,37 +68,37 @@ var login = React.createClass({
     var user_code = this.state.user_code;
     var user_pass = this.state.user_pass;
     var temp = this;
-    // fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
-    //   headers:{
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json',
-    //     'Authorization': make_base_auth('b_wang', 'b_wang')
-    //   }
-    // }).then(
-    //   function(response) {
-    //     if (response.status === 401) {
-    //       AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
-    //     }
-    //     if (response.status === 200) {
-    //       var result = JSON.parse(response._bodyText);
-    //       if (parseInt(result.totalCount) > 0) {
-    //         this.props.navigator.push({
-    //           title: 'Summary',
-    //           component: Summary,
-    //         });
-    //         //temp.login_seccess;
-    //         //AlertIOS.alert("ログイン成功！")
-    //       } else {
-    //         AlertIOS.alert("ユーザー・パスワードが無効！")
-    //       }
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          if (parseInt(result.totalCount) > 0) {
+            temp.props.navigator.resetTo({
+              component: home,
+            });
+          } else {
+            AlertIOS.alert("ユーザー・パスワードが無効！");
+            temp.state.user_code = '';
+            temp.state.user_pass = '';
+          }
 
-    //     }
-    //   }
-    // ).catch(function(err) {
-    //   AlertIOS.alert("システムエラー！");
-    // });
-    this.props.navigator.resetTo({
-      component: home,
+        }
+      }
+    ).catch(function(err) {
+      if(err) {
+        AlertIOS.alert("システムエラー！");  
+        temp.state.user_code = '';
+        temp.state.user_pass = '';
+      }
     });
   }
 });
