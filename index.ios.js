@@ -7,6 +7,10 @@
 var React = require('react-native');
 var login = require('./ios_views/login/login.ios');
 
+//for test by yt delete the code before commit 
+var home = require('./ios_views/common/home');
+var debug = 1;
+
 var {
   AppRegistry,
   StyleSheet,
@@ -17,10 +21,16 @@ var {
 var oursToDo = React.createClass({
   
   render: function() {
+    var firstComponent;
+    if (debug) {
+      firstComponent=home;
+    } else {
+      firstComponent=login;
+    }
     return (
       
       <Navigator
-          initialRoute={{ name: login, component: login }}
+          initialRoute={{ name: login, component: firstComponent }}
           configureScene={() => {
             return Navigator.SceneConfigs.VerticalDownSwipeJump;
           }}
