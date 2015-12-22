@@ -250,7 +250,7 @@ module.exports = React.createClass({
     }
 
     return (
-      <TouchableHighlight onPress={() => this.todoListPage(rowData.group_code)}>
+      <TouchableHighlight onPress={() => this.todoListPage(rowData.group_name_short)}>
         <View style={styles.container}>
           <Image style={styles.thumbnail} source={imageURL} />
 

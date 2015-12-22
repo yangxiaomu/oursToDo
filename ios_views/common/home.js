@@ -59,6 +59,10 @@ var home = React.createClass({
     } else {
       return (
         <NavigatorIOS style={styles.wrapper}
+          ref="nav"
+          tintColor='#DA552F'
+          barTintColor='#FFFFFD'
+          titleTextColor='#DA552F'
           initialRoute={{
             component: this.state.selectedTab,
             title: title,
