@@ -6,7 +6,7 @@
 
 var React = require('react-native');
 var Navigation = require('./navigation');
-var GroupToDo = require('./../group/todo_group_list');
+var oursToDo = require('./../group/todo_group_list');
 var Summary = require('./../summary/sum_group_list');
 var addGroup = require('./../group/add_group');
 
@@ -31,19 +31,16 @@ var home = React.createClass({
   getInitialState: function(){
     //AlertIOS.alert(this.prop.user_code)    
     return {
-      selectedTab: GroupToDo
+      selectedTab: oursToDo
     };
   },
 
   onRightButtonPress: function() {
-    this.refs.nav.push({
-      title: 'addGroup',
-      component: addGroup
-    })
+    AlertIOS.alert("すみません、グループ追加機能がまだですよ！Sm@rtDBで追加お願いします。");
   },
 
   _renderContent: function(category: string, title: ?string) {
-    if (title == "GroupToDo") {
+    if (title == "oursToDo") {
       return (
         <NavigatorIOS style={styles.wrapper}
           ref="nav"
@@ -77,21 +74,21 @@ var home = React.createClass({
       <TabBarIOS tintColor={"#ea4c89"}>
 
         <Icon.TabBarItem
-          title="todo列表"
+          title="oursToDo"
           iconName="group"
           selectedIconName="group"
-          selected={this.state.selectedTab == GroupToDo}
+          selected={this.state.selectedTab == oursToDo}
           onPress={() => {
             this.setState({
-              selectedTab: GroupToDo
+              selectedTab: oursToDo
             });
           }}>
-          {this._renderContent("GroupToDo", "GroupToDo")}
+          {this._renderContent("oursToDo", "oursToDo")}
 
         </Icon.TabBarItem>
 
         <Icon.TabBarItem
-          title="统计"
+          title="統計"
           iconName="bar-chart"
           selectedIconName="bar-chart"
           selected={this.state.selectedTab == Summary}

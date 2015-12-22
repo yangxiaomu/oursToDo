@@ -102,12 +102,6 @@ module.exports = React.createClass({
 
     return (
       <View style={styles.listContainer}>
-        <TextInput
-          style={styles.searchInput}
-          onChangeText={(text) => this.setState({input: text})}
-          placeholder='Search...'
-        />
-
         <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderGroup}
@@ -125,7 +119,7 @@ module.exports = React.createClass({
     return (
       <View style={styles.container}>
         <Text>
-          正在加载数据……
+          Loading……
         </Text>
       </View>
     );

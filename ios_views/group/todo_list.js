@@ -99,7 +99,7 @@ var todoList= React.createClass({
     return (
       <View style={styles.container}>
         <Text>
-          正在加载数据……
+          Loading……
         </Text>
       </View>
     );
