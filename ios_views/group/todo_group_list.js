@@ -30,6 +30,9 @@ var GROUP_LIST={"groups":[
   ,{id:'6',name:'devOps',icon:'nhk.png'}
 ]};
 
+//var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}) // assumes immutable objects
+
+
 var {
   AppRegistry,
   Image,
@@ -40,6 +43,7 @@ var {
   TextInput,
   AlertIOS,
   Navigator,
+  TouchableHighlight
 } = React;
 
 module.exports = React.createClass({
@@ -50,6 +54,13 @@ module.exports = React.createClass({
       }),
       loaded: false,
     };
+  },
+
+  componentWillMount: function() {
+    Icon.getImageSource('github-alt', 30)
+      .then((source) => {
+        this.setState({ shareIcon: source })
+      });
   },
 
   componentDidMount: function() {
@@ -92,8 +103,9 @@ module.exports = React.createClass({
     return (
       <View style={styles.listContainer}>
         <TextInput
-          style={{marginTop:44,height: 40, borderColor: 'gray', borderWidth: 1}}
+          style={styles.searchInput}
           onChangeText={(text) => this.setState({input: text})}
+          placeholder='Search...'
         />
 
         <ListView
@@ -129,8 +141,8 @@ module.exports = React.createClass({
       component: TodoList,
       //leftButtonTitle: 'Custom Left',
       onLeftButtonPress: () => this.props.navigator.pop(),
-      //rightButtonIcon: ,
-      rightButtonTitle: 'New',
+      rightButtonIcon: this.state.shareIcon,
+      //rightButtonTitle: 'New',
 
       onRightButtonPress: () => this.props.navigator.push({
         title: 'NewTodo',
@@ -161,29 +173,74 @@ module.exports = React.createClass({
    * 绘制group
    * added by ql_wu
    */
-  renderGroup: function(group) {
+  renderGroup: function(rowData: string, sectionID: number, rowID: number) {
+    var rowHash = Math.abs(hashCode(rowData));
+    var imgSource= require('./../../img/group_2.jpg');
     return (
-      <View style={styles.container}>
-        <Image
-          source={require('./../../img/icon_group_todo.jpg')}
-          style={styles.thumbnail}
-        />
-        <View style={styles.rightContainer}>
-          <Text style={styles.title} onPress={this.todoListPage.bind(this,group.id)}>{group.name}</Text>
+      <TouchableHighlight onPress={() => this.todoListPage(rowData.id)}>
+        <View style={styles.container}>
+          <Image style={styles.thumbnail} source={imgSource} />
+          <View style={styles.postDetailsContainer}>
+            <Text style={styles.postTitle}>
+              {rowData.name}
+            </Text>
+            <Text style={styles.postDetailsLine}>
+              {LOREM_IPSUM.substr(0, rowHash % 301 + 10)}
+            </Text>
+          <View style={styles.separator} />
+          </View>
         </View>
-      </View>
+      </TouchableHighlight>
     );
   },
 });
 
-var styles = StyleSheet.create({
-  listView: {
-    paddingTop: 20,
-    backgroundColor: '#F5FCFF',
-  },
+var LOREM_IPSUM = 'Lorem ipsum dolor sit amet, ius ad pertinax oportere accommodare, an vix civibus corrumpit referrentur. Te nam case ludus inciderint, te mea facilisi adipiscing. Sea id integre luptatum. In tota sale consequuntur nec. Erat ocurreret mei ei. Eu paulo sapientem vulputate est, vel an accusam intellegam interesset. Nam eu stet pericula reprimique, ea vim illud modus, putant invidunt reprehendunt ne qui.';
 
-  rightContainer: {
+
+var hashCode = function(str) {
+  var hash = 15;
+  for (var ii = str.length - 1; ii >= 0; ii--) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(ii);
+  }
+  return hash;
+};
+
+var styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 5,
+    backgroundColor: '#fff',
+  },
+  listView: {
+    backgroundColor: '#aaa',
+  },
+  text: {
     flex: 1,
+  },
+  postCount: {
+    fontSize: 20,
+    textAlign: 'right',
+    margin: 10,
+    color: 'gray',
+    marginLeft: 15,
+  },
+  postDetailsContainer:{
+    flex: 1,
+  },
+  postTitle: {
+    fontSize: 15,
+    textAlign: 'left',
+    marginTop: 10,
+    marginBottom: 4,
+    marginRight: 10,
+    color: '#DA552F'
+  },
+  postDetailsLine: {
+    fontSize: 12,
+    marginBottom: 10,
+    color: 'gray',
   },
   title: {
     fontSize: 20,
@@ -196,13 +253,22 @@ var styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    //justifyContent: 'center',
+    //alignItems: 'center',
+    backgroundColor: '#FFFFFD',
   },
   thumbnail : {
-    width: 53,
-    height: 53,
+    width: 48,
+    height: 48,
+    borderRadius: 25,
+    marginTop: 10,
+    alignSelf: 'center',
+    marginRight: 15,
+    marginLeft: 15
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#CCCCCC',
   },
   searchRow: {
     backgroundColor: '#eeeeee',
@@ -218,4 +284,17 @@ var styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 8,
   },
+  searchInput: {
+    height: 36,
+    padding: 4,
+    //marginRight: 5,
+    margin:5,
+    marginTop:44,
+    flex: 4,
+    fontSize: 18,
+    borderWidth: 1,
+    borderColor: '#48BBEC',
+    borderRadius: 8,
+    color: '#48BBEC'
+  }
 });

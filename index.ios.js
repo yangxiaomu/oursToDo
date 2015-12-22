@@ -7,24 +7,39 @@
 var React = require('react-native');
 var login = require('./ios_views/login/login.ios');
 
+//for test by yt delete the code before commit 
+var home = require('./ios_views/common/home');
+var debug = 1;
+
 var {
   AppRegistry,
   StyleSheet,
   View,
-  NavigatorIOS
+  Navigator
 } = React;
 
 var oursToDo = React.createClass({
   
   render: function() {
+    var firstComponent;
+    if (debug) {
+      firstComponent=home;
+    } else {
+      firstComponent=login;
+    }
     return (
-      <NavigatorIOS style={styles.wrapper}
-        navigationBarHidden={true}
-        initialRoute={{
-          component: login,
-          title: 'login',
-          //passProps: { myProp: 'foo' },
-        }}
+      
+      <Navigator
+          initialRoute={{ name: login, component: firstComponent }}
+          configureScene={() => {
+            return Navigator.SceneConfigs.VerticalDownSwipeJump;
+          }}
+          renderScene={(route, navigator) => {
+            let Component = route.component;
+            if(route.component) {
+              return <Component {...route.params} navigator={navigator} />
+            }
+          }} 
       />
     );
   },
