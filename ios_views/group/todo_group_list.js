@@ -279,7 +279,7 @@ var hashCode = function(str) {
 
 var styles = StyleSheet.create({
   listContainer: {
-    marginTop: 45
+    marginTop: 45,
   },
   row: {
     flexDirection: 'row',
@@ -288,7 +288,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   listView: {
-    backgroundColor: '#aaa',
+    backgroundColor: '#F8F8FF',
   },
   text: {
     flex: 1,

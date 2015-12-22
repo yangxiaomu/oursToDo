@@ -26,6 +26,7 @@ var {
   ListView,
   TextInput,
   AlertIOS,
+  TouchableHighlight
 } = React;
 
 var todoList= React.createClass({
@@ -77,14 +78,9 @@ var todoList= React.createClass({
 
     return (
       <View style={styles.listContainer}>
-        <TextInput
-          style={{marginTop:44,height: 40, borderColor: 'gray', borderWidth: 1}}
-          onChangeText={(text) => this.setState({input: text})}
-        />
-
         <ListView
           dataSource={this.state.dataSource}
-          renderRow={this.renderGroup}
+          renderRow={this.renderGroup1}
           style={styles.listView}
         />
       </View>
@@ -150,49 +146,103 @@ var todoList= React.createClass({
       </View>
     );
   },
+  renderGroup1: function(rowData: string, sectionID: number, rowID: number) {
+    var rowHash = Math.abs(hashCode(rowData));
+    var imgSource= require('./../../img/t_yang.jpg');
+    return (
+      <TouchableHighlight onPress={() => this.todoListPage(rowData.id)}>
+        <View style={styles.container}>
+          <Image style={styles.thumbnail} source={imgSource} />
+          <View style={styles.postDetailsContainer}>
+            <Text style={styles.postTitle}>
+              {rowData.name}
+            </Text>
+            <Text style={styles.postDetailsLine}>
+              {LOREM_IPSUM.substr(0, rowHash % 301 + 10)}
+            </Text>
+          <View style={styles.separator} />
+          </View>
+        </View>
+      </TouchableHighlight>
+    );
+  },
 });
 
-var styles = StyleSheet.create({
-  listView: {
-    paddingTop: 20,
-    backgroundColor: '#F5FCFF',
-  },
+var LOREM_IPSUM = 'Lorem ipsum dolor sit amet, ius ad pertinax oportere accommodare, an vix civibus corrumpit referrentur. Te nam case ludus inciderint, te mea facilisi adipiscing. Sea id integre luptatum. In tota sale consequuntur nec. Erat ocurreret mei ei. Eu paulo sapientem vulputate est, vel an accusam intellegam interesset. Nam eu stet pericula reprimique, ea vim illud modus, putant invidunt reprehendunt ne qui.';
 
-  rightContainer: {
+
+var hashCode = function(str) {
+  var hash = 15;
+  for (var ii = str.length - 1; ii >= 0; ii--) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(ii);
+  }
+  return hash;
+};
+
+var styles = StyleSheet.create({
+  listContainer: {
+
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 5,
+    backgroundColor: '#fff',
+  },
+  listView: {
+    backgroundColor: '#F8F8FF',
+    //marginTop:44
+  },
+  text: {
     flex: 1,
+  },
+  postCount: {
+    fontSize: 20,
+    textAlign: 'right',
+    margin: 10,
+    color: 'gray',
+    marginLeft: 15,
+  },
+  postDetailsContainer:{
+    flex: 1,
+  },
+  postTitle: {
+    fontSize: 15,
+    textAlign: 'left',
+    marginTop: 10,
+    marginBottom: 4,
+    marginRight: 10,
+    color: '#DA552F'
+  },
+  postDetailsLine: {
+    fontSize: 12,
+    marginBottom: 10,
+    color: 'gray',
   },
   title: {
     fontSize: 20,
     marginBottom: 8,
     textAlign: 'center',
   },
-  year: {
-    textAlign: 'center',
-  },
   container: {
-    flex: 1,
+    //flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    //justifyContent: 'center',
+    //alignItems: 'center',
+    backgroundColor: '#FFFFFD',
   },
   thumbnail : {
-    width: 53,
-    height: 53,
+    width: 45,
+    height: 45,
+    borderRadius: 20,
+    marginTop: 1,
+    alignSelf: 'center',
+    marginRight: 15,
+    marginLeft: 15
   },
-  searchRow: {
-    backgroundColor: '#eeeeee',
-    paddingTop: 75,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 10,
-  },
-  searchTextInput: {
-    backgroundColor: 'white',
-    borderColor: '#cccccc',
-    borderRadius: 3,
-    borderWidth: 1,
-    paddingLeft: 8,
+  separator: {
+    height: 1,
+    backgroundColor: '#CCCCCC',
   },
 });
 
