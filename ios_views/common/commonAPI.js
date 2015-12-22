@@ -92,6 +92,39 @@ var commonAPI = {
 		}
 		return result;
   	},
+
+  	createTask: function(doc){
+		var result = {};
+		if (!_.isUndefined(doc)) {
+			_.each(doc["item"],function(item){
+				if(item["key"] == "task_code"){
+					result["task_code"] = item["value"];
+				}
+				else if(item["key"] == "group_code"){
+					result["group_code"] = item["value"];
+				}
+				else if(item["key"] == "user_code"){
+					result["user_code"] = item["value"];
+				}
+				else if(item["key"] == "endDate"){
+					result["endDate"] = item["value"];
+				}
+				else if(item["key"] == "task_title"){
+					result["task_title"] = item["value"];
+				}
+				else if(item["key"] == "task_body"){
+					result["task_body"] = item["value"];
+				}
+				else if(item["key"] == "task_status"){
+					result["task_status"] = item["value"];
+				}
+				else if(item["key"] == "finish_date"){
+					result["finish_date"] = item["value"];
+				}
+			});
+		}
+		return result;
+  	}
 };
 
 module.exports = commonAPI;

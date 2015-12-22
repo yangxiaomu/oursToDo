@@ -69,13 +69,94 @@ module.exports = React.createClass({
           var groups = [];
           _.each(result.document, function(group, index) {
             var group = commonAPI.createGroup(group);
+            group.users = 0;
+            group.tasks = 0;
             groups.push(group);
           });
+
+          tempThis.getGroupUsers(groups, tempThis);
+
+        }
+      }
+    )
+    .done();
+  },
+
+  getGroupUsers: function(groups, tempThis) {
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents', {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result);
+          var totalGroups = [];
+          _.each(result.document, function(group, index) {
+            var group = commonAPI.createGroup(group);
+            totalGroups.push(group);
+          });
+
+          var tmpGroups = [];
+          _.each(groups, function(item) {
+            _.each(totalGroups, function(item2) {
+              if (item.group_code == item2.group_code) {
+                item.users++;
+              }
+            });
+            tmpGroups.push(item);
+          });
+
+          tempThis.getGroupTasks(tmpGroups, tempThis);
           
+        }
+      }
+    )
+    .done();
+  },
+
+  getGroupTasks: function(groups, tempThis) {
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents', {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result);
+          var tasks = [];
+          _.each(result.document, function(task, index) {
+            var task = commonAPI.createTask(task);
+            tasks.push(task);
+          });
+
+          var tmpGroups = [];
+          _.each(groups, function(item) {
+            _.each(tasks, function(item2) {
+              if (item.group_code == item2.group_code) {
+                item.tasks++;
+              }
+            });
+            tmpGroups.push(item);
+          });
+
           tempThis.setState({
-            dataSource: tempThis.state.dataSource.cloneWithRows(groups),
+            dataSource: tempThis.state.dataSource.cloneWithRows(tmpGroups),
             loaded: true,
           });
+          
         }
       }
     )
@@ -151,7 +232,7 @@ module.exports = React.createClass({
    * 绘制group
    * added by ql_wu
    */
-  renderGroup: function(rowData: string, sectionID: number, rowID: number) {
+  renderGroup: function(rowData: string) {
     var rowHash = Math.abs(hashCode(rowData));
     var imageURL = '';
     if (rowData.group_code == "idea") {
@@ -166,8 +247,8 @@ module.exports = React.createClass({
       imageURL = require('./../../img/java.jpg');
     } else if (rowData.group_code == "sports") {
       imageURL = require('./../../img/sports.jpg');
-    } 
-    
+    }
+
     return (
       <TouchableHighlight onPress={() => this.todoListPage(rowData.group_code)}>
         <View style={styles.container}>
@@ -178,7 +259,7 @@ module.exports = React.createClass({
               {rowData.group_name}
             </Text>
             <Text style={styles.postDetailsLine}>
-              {LOREM_IPSUM.substr(0, rowHash % 301 + 10)}
+              参加者：{rowData.users}人      タスク数：{rowData.tasks}
             </Text>
           <View style={styles.separator} />
           </View>
@@ -187,8 +268,6 @@ module.exports = React.createClass({
     );
   },
 });
-
-var LOREM_IPSUM = 'Lorem ipsum dolor sit amet, ius ad pertinax oportere accommodare, an vix civibus corrumpit referrentur. Te nam case ludus inciderint, te mea facilisi adipiscing. Sea id integre luptatum. In tota sale consequuntur nec. Erat ocurreret mei ei. Eu paulo sapientem vulputate est, vel an accusam intellegam interesset. Nam eu stet pericula reprimique, ea vim illud modus, putant invidunt reprehendunt ne qui.';
 
 var hashCode = function(str) {
   var hash = 15;
