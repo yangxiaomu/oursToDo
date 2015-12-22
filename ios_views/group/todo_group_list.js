@@ -56,6 +56,13 @@ module.exports = React.createClass({
     };
   },
 
+  componentWillMount: function() {
+    Icon.getImageSource('github-alt', 30)
+      .then((source) => {
+        this.setState({ shareIcon: source })
+      });
+  },
+
   componentDidMount: function() {
     // this.getGroupByAPI();
     this.getGroup();
@@ -96,8 +103,9 @@ module.exports = React.createClass({
     return (
       <View style={styles.listContainer}>
         <TextInput
-          style={{marginTop:44,height: 40, borderColor: 'gray', borderWidth: 1}}
+          style={styles.searchInput}
           onChangeText={(text) => this.setState({input: text})}
+          placeholder='Search...'
         />
 
         <ListView
@@ -133,8 +141,8 @@ module.exports = React.createClass({
       component: TodoList,
       //leftButtonTitle: 'Custom Left',
       onLeftButtonPress: () => this.props.navigator.pop(),
-      //rightButtonIcon: ,
-      rightButtonTitle: 'New',
+      rightButtonIcon: this.state.shareIcon,
+      //rightButtonTitle: 'New',
 
       onRightButtonPress: () => this.props.navigator.push({
         title: 'NewTodo',
@@ -206,7 +214,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   listView: {
-    backgroundColor: '#fff',
+    backgroundColor: '#aaa',
   },
   text: {
     flex: 1,
@@ -276,4 +284,17 @@ var styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 8,
   },
+  searchInput: {
+    height: 36,
+    padding: 4,
+    //marginRight: 5,
+    margin:5,
+    marginTop:44,
+    flex: 4,
+    fontSize: 18,
+    borderWidth: 1,
+    borderColor: '#48BBEC',
+    borderRadius: 8,
+    color: '#48BBEC'
+  }
 });
