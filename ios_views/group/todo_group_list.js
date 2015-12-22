@@ -8,30 +8,8 @@ var React = require('react-native');
 var TodoList = require('./todo_list');
 var AddToDo = require('./add_todo');
 var Icon = require("react-native-vector-icons/FontAwesome");
-
-
-var API_KEY = '7waqfqbprs7pajbz28mqf6vz';
-var API_URL = 'http://api.rottentomatoes.com/api/public/v1.0/lists/movies/in_theaters.json';
-var PAGE_SIZE = 25;
-var PARAMS = '?apikey=' + API_KEY + '&page_limit=' + PAGE_SIZE;
-var REQUEST_URL = API_URL + PARAMS;
-
-var GROUP_LIST={"groups":[
-  {id:'1',name:'suzuken',icon:'suzuken.png'}
-  ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
-  ,{id:'3',name:'NHK',icon:'nhk.png'}
-  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
-  ,{id:'5',name:'ICO',icon:'nhk.png'}
-  ,{id:'6',name:'devOps',icon:'nhk.png'}
-  ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
-  ,{id:'3',name:'NHK',icon:'nhk.png'}
-  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
-  ,{id:'5',name:'ICO',icon:'nhk.png'}
-  ,{id:'6',name:'devOps',icon:'nhk.png'}
-]};
-
-//var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}) // assumes immutable objects
-
+var commonAPI = require('../common/commonAPI');
+var _ = require('underscore');
 
 var {
   AppRegistry,
@@ -57,15 +35,14 @@ module.exports = React.createClass({
   },
 
   componentWillMount: function() {
-    Icon.getImageSource('github-alt', 30)
+    Icon.getImageSource('plus-circle', 20)
       .then((source) => {
         this.setState({ shareIcon: source })
       });
   },
 
   componentDidMount: function() {
-    // this.getGroupByAPI();
-    this.getGroup();
+    this.getGroupByAPI();
   },
   
   /**
@@ -73,26 +50,36 @@ module.exports = React.createClass({
    * added by ql_wu
    */
   getGroupByAPI: function() {
-    var _data=MOVE_RETURN;
-    fetch(REQUEST_URL)
-      .then((response) => response.json())
-      .then((responseData) => {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
-          loaded: true,
-        });
-      })
-      .done();
-  },
-  
-  /**
-   * 获取组织列表，假数据，开发测试用
-   * added by ql_wu
-   */
-  getGroup: function(){
-    var _data=GROUP_LIST;
-    this.setState({dataSource: this.state.dataSource.cloneWithRows(_data.groups),
-      loaded: true,});
+    var tempThis = this;
+
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents?members=' + 'b_wang', {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result);
+          var groups = [];
+          _.each(result.document, function(group, index) {
+            var group = commonAPI.createGroup(group);
+            groups.push(group);
+          });
+          
+          tempThis.setState({
+            dataSource: tempThis.state.dataSource.cloneWithRows(groups),
+            loaded: true,
+          });
+        }
+      }
+    )
+    .done();
   },
 
   render: function() {
@@ -109,6 +96,7 @@ module.exports = React.createClass({
         />
       </View>
     );
+
   },
   
   /**
@@ -129,25 +117,21 @@ module.exports = React.createClass({
    * 跳转：组织下todo list画面
    * added by ql_wu
    */
-  todoListPage: function(id){
+  todoListPage: function(group_code){
     this.props.navigator.push({
-      title: 'ICO',
+      title: group_code,
       component: TodoList,
-      //leftButtonTitle: 'Custom Left',
       onLeftButtonPress: () => this.props.navigator.pop(),
       rightButtonIcon: this.state.shareIcon,
-      //rightButtonTitle: 'New',
-
       onRightButtonPress: () => this.props.navigator.push({
         title: 'NewTodo',
         component: AddToDo,
-        //leftButtonTitle: 'Custom Left',
         onLeftButtonPress: () => this.props.navigator.pop(),
 
       }),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',
-        id: id
+        id: group_code
       }
     });
   },
@@ -169,14 +153,29 @@ module.exports = React.createClass({
    */
   renderGroup: function(rowData: string, sectionID: number, rowID: number) {
     var rowHash = Math.abs(hashCode(rowData));
-    var imgSource= require('./../../img/group_2.jpg');
+    var imageURL = '';
+    if (rowData.group_code == "idea") {
+      imageURL = require('./../../img/idea.jpg');
+    } else if (rowData.group_code == "nhk") {
+      imageURL = require('./../../img/nhk.jpg');
+    } else if (rowData.group_code == "fuji") {
+      imageURL = require('./../../img/fuji.jpg');
+    } else if (rowData.group_code == "react_native") {
+      imageURL = require('./../../img/react_native.jpg');
+    } else if (rowData.group_code == "java") {
+      imageURL = require('./../../img/java.jpg');
+    } else if (rowData.group_code == "sports") {
+      imageURL = require('./../../img/sports.jpg');
+    } 
+    
     return (
-      <TouchableHighlight onPress={() => this.todoListPage(rowData.id)}>
+      <TouchableHighlight onPress={() => this.todoListPage(rowData.group_code)}>
         <View style={styles.container}>
-          <Image style={styles.thumbnail} source={imgSource} />
+          <Image style={styles.thumbnail} source={imageURL} />
+
           <View style={styles.postDetailsContainer}>
             <Text style={styles.postTitle}>
-              {rowData.name}
+              {rowData.group_name}
             </Text>
             <Text style={styles.postDetailsLine}>
               {LOREM_IPSUM.substr(0, rowHash % 301 + 10)}
@@ -191,7 +190,6 @@ module.exports = React.createClass({
 
 var LOREM_IPSUM = 'Lorem ipsum dolor sit amet, ius ad pertinax oportere accommodare, an vix civibus corrumpit referrentur. Te nam case ludus inciderint, te mea facilisi adipiscing. Sea id integre luptatum. In tota sale consequuntur nec. Erat ocurreret mei ei. Eu paulo sapientem vulputate est, vel an accusam intellegam interesset. Nam eu stet pericula reprimique, ea vim illud modus, putant invidunt reprehendunt ne qui.';
 
-
 var hashCode = function(str) {
   var hash = 15;
   for (var ii = str.length - 1; ii >= 0; ii--) {
@@ -201,6 +199,9 @@ var hashCode = function(str) {
 };
 
 var styles = StyleSheet.create({
+  listContainer: {
+    marginTop: 45
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -253,15 +254,16 @@ var styles = StyleSheet.create({
   },
   thumbnail : {
     width: 48,
-    height: 48,
+    height: 45,
     borderRadius: 25,
-    marginTop: 10,
+    marginTop: 1,
     alignSelf: 'center',
     marginRight: 15,
     marginLeft: 15
   },
   separator: {
     height: 1,
+    //marginRight: 20,
     backgroundColor: '#CCCCCC',
   },
   searchRow: {
