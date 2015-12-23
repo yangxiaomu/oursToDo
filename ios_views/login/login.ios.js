@@ -86,8 +86,11 @@ var login = React.createClass({
         if (response.status === 200) {
           var result = JSON.parse(response._bodyText);
           if (parseInt(result.totalCount) > 0) {
-            temp.props.navigator.resetTo({
+            temp.props.navigator.push({
               component: home,
+              passProps: {
+                user_code: user_code
+              }
             });
           } else {
             AlertIOS.alert("ユーザー・パスワードが無効！");

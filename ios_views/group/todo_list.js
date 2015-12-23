@@ -7,15 +7,11 @@
 var React = require('react-native');
 var Header = require('./../common/header');
 var todoDetail = require('./todo_detail');
-
-var GROUP_LIST={"groups":[
-  {id:'1',name:'suzuken',icon:'suzuken.png'}
-  ,{id:'2',name:'fuji',icon:'fujifilm.jpg'}
-  ,{id:'3',name:'NHK',icon:'nhk.png'}
-  ,{id:'4',name:'SmartDB',icon:'nhk.png'}
-  ,{id:'5',name:'ICO',icon:'nhk.png'}
-  ,{id:'6',name:'devOps',icon:'nhk.png'}
-]};
+var Dimensions = require('Dimensions');
+var windowSize = Dimensions.get('window');
+var commonAPI = require('../common/commonAPI');
+var Icon = require("react-native-vector-icons/FontAwesome");
+var _ = require('underscore');
 
 var {
   AppRegistry,
@@ -26,7 +22,8 @@ var {
   ListView,
   TextInput,
   AlertIOS,
-  TouchableHighlight
+  TouchableHighlight,
+  SegmentedControlIOS
 } = React;
 
 var todoList= React.createClass({
@@ -36,41 +33,97 @@ var todoList= React.createClass({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
       loaded: false,
+      values: ['未完了', '全て', '自分', '担当者なし'],
+      selectedIndex: 0
     };
   },
 
+  componentWillMount: function() {
+    Icon.getImageSource('star', 30)
+      .then((source) => {
+        this.setState({ starIcon: source })
+    });
+
+    Icon.getImageSource('star-o', 30)
+    .then((source) => {
+      this.setState({ starOIcon: source })
+    });
+  },
+
   componentDidMount: function() {
-    // this.getGroupByAPI();
-    this.getGroup();
+    this.getTaskAPI();
   },
   
   /**
    * 从smartDB restAPI获取组织列表
    * added by ql_wu
    */
-  getGroupByAPI: function() {
-    var _data=MOVE_RETURN;
-    fetch(REQUEST_URL)
-      .then((response) => response.json())
-      .then((responseData) => {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
-          loaded: true,
-        });
-      })
-      .done();
+  getTaskAPI: function() {
+    var tempThis = this;
+    var user_code = this.props.user_code;
+    var group_code = this.props.group_code;
+    var tempThis = this;
+
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents?group_code=' + group_code + "&sort=finish_date:DESC", {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result);
+          var tasks = [];
+          _.each(result.document, function(task, index) {
+            var task = commonAPI.createTask(task);
+            tasks.push(task);
+          });
+
+          var selectedTasks = [];
+          // 選択状態SegmentedControlIOS
+          if(tempThis.state.selectedIndex == 0) {
+            // 未完了
+            _.each(tasks, function(task) {
+              if(task.task_status.id == "2") {
+                selectedTasks.push(task);
+              }
+            });
+          } else if (tempThis.state.selectedIndex == 1) {
+            // 完了
+            selectedTasks = tasks;
+
+          } else if (tempThis.state.selectedIndex == 2) {
+            // 自分
+            _.each(tasks, function(task) {
+              if(task.user_code == "b_wang") {
+                selectedTasks.push(task);
+              }
+            });
+          } else if (tempThis.state.selectedIndex == 3) {
+            // 担当者なし
+            _.each(tasks, function(task) {
+              if(task.user_code == "") {
+                selectedTasks.push(task);
+              }
+            });
+          }
+
+          tempThis.setState({
+            dataSource: tempThis.state.dataSource.cloneWithRows(selectedTasks),
+            loaded: true,
+          });
+
+        }
+      }
+    )
+    .done();
   },
   
-  /**
-   * 获取组织列表，假数据，开发测试用
-   * added by ql_wu
-   */
-  getGroup: function(){
-    var _data=GROUP_LIST;
-    this.setState({dataSource: this.state.dataSource.cloneWithRows(_data.groups),
-      loaded: true,});
-  },
-
   render: function() {
     if(!this.state.loaded){
       return this.renderLoadingView();
@@ -78,13 +131,25 @@ var todoList= React.createClass({
 
     return (
       <View style={styles.listContainer}>
+        <SegmentedControlIOS 
+          tintColor="#DA552F" 
+          values={this.state.values}
+          selectedIndex={this.state.selectedIndex}
+          onChange={this._onChange} />
         <ListView
           dataSource={this.state.dataSource}
-          renderRow={this.renderGroup1}
+          renderRow={this.renderTask}
           style={styles.listView}
         />
       </View>
     );
+  },
+
+   _onChange: function(event) {
+    this.setState({
+      selectedIndex: event.nativeEvent.selectedSegmentIndex,
+    });
+    this.getTaskAPI();
   },
   
   /**
@@ -105,62 +170,56 @@ var todoList= React.createClass({
    * 跳转：组织下todo list画面
    * added by ql_wu
    */
-  todoListPage: function(id){
+  goToTaskDetail: function(id){
     this.props.navigator.push({
-      title: 'ICO',
+      title: 'タスク詳細',
       component: todoDetail,
       //leftButtonTitle: 'Custom Left',
       onLeftButtonPress: () => this.props.navigator.pop(),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',
-        id: id
+        task_code: id
       }
     });
   },
-
-  /**
-   * 跳转：新增todo画面
-   * added by ql_wu
-   */
-  addToDoPage:function(){
-    this.props.navigator.push({
-      title: 'AddToDo',
-      component: AddToDo,
-    });
-  },
   
-  /**
-   * 绘制group
-   * added by ql_wu
-   */
-  renderGroup: function(group) {
+  renderTask: function(rowData: string, sectionID: number, rowID: number) {
+    
+    var imgSource = '';
+
+    if (rowData.user_code == 'b_wang') {
+      imgSource = require('./../../img/b_wang.jpg');
+    } else if (rowData.user_code == 't_yang') {
+      imgSource = require('./../../img/t_yang.jpg');
+    } else if (rowData.user_code == 'ql_wu') {
+      imgSource = require('./../../img/ql_wu.jpg');
+    } else {
+      imgSource = require('./../../img/wenhao.jpg');
+    }
+
+    var backgroundCSS = styles.postDetailsContainer;
+    var titleCSS = styles.postTitle;
+    var bodyCSS = styles.postDetailsLine;
+    if (rowData.task_status.id == "1") {
+      backgroundCSS = styles.postDetailsContainer_grey;
+      titleCSS = styles.postTitle_white;
+      bodyCSS = styles.postDetailsLine_white;
+    }
+    
+    var taskBody = rowData.task_body.length > 15 ? rowData.task_body.substr(0, 15) + '...' : rowData.task_body.substr(0, 15)
+
     return (
-      <View style={styles.container}>
-        <Image
-          source={require('./../../img/icon_group_todo.jpg')}
-          style={styles.thumbnail}
-        />
-        <View style={styles.rightContainer}>
-          <Text style={styles.title} onPress={this.todoListPage.bind(this,group.id)}>{group.name}</Text>
-        </View>
-      </View>
-    );
-  },
-  renderGroup1: function(rowData: string, sectionID: number, rowID: number) {
-    var rowHash = Math.abs(hashCode(rowData));
-    var imgSource= require('./../../img/t_yang.jpg');
-    return (
-      <TouchableHighlight onPress={() => this.todoListPage(rowData.id)}>
+      <TouchableHighlight onPress={() => this.goToTaskDetail(rowData.task_code)}>
         <View style={styles.container}>
           <Image style={styles.thumbnail} source={imgSource} />
-          <View style={styles.postDetailsContainer}>
-            <Text style={styles.postTitle}>
-              {rowData.name}
+          <View style={backgroundCSS}>
+            <Text style={titleCSS}>
+              {rowData.task_title}
             </Text>
-            <Text style={styles.postDetailsLine}>
-              {LOREM_IPSUM.substr(0, rowHash % 301 + 10)}
+            <Text style={bodyCSS}>
+              {taskBody}
             </Text>
-          <View style={styles.separator} />
+            <View style={styles.separator} />
           </View>
         </View>
       </TouchableHighlight>
@@ -168,20 +227,10 @@ var todoList= React.createClass({
   },
 });
 
-var LOREM_IPSUM = 'Lorem ipsum dolor sit amet, ius ad pertinax oportere accommodare, an vix civibus corrumpit referrentur. Te nam case ludus inciderint, te mea facilisi adipiscing. Sea id integre luptatum. In tota sale consequuntur nec. Erat ocurreret mei ei. Eu paulo sapientem vulputate est, vel an accusam intellegam interesset. Nam eu stet pericula reprimique, ea vim illud modus, putant invidunt reprehendunt ne qui.';
-
-
-var hashCode = function(str) {
-  var hash = 15;
-  for (var ii = str.length - 1; ii >= 0; ii--) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(ii);
-  }
-  return hash;
-};
-
 var styles = StyleSheet.create({
   listContainer: {
-
+    height: windowSize.height,
+    marginTop: 45
   },
   row: {
     flexDirection: 'row',
@@ -190,8 +239,8 @@ var styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   listView: {
-    backgroundColor: '#F8F8FF',
-    //marginTop:44
+    backgroundColor: 'white',
+    marginTop:2
   },
   text: {
     flex: 1,
@@ -206,6 +255,10 @@ var styles = StyleSheet.create({
   postDetailsContainer:{
     flex: 1,
   },
+  postDetailsContainer_grey:{
+    flex: 1,
+    backgroundColor: 'gray'
+  },
   postTitle: {
     fontSize: 15,
     textAlign: 'left',
@@ -218,6 +271,19 @@ var styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
     color: 'gray',
+  },
+  postTitle_white: {
+    fontSize: 15,
+    textAlign: 'left',
+    marginTop: 10,
+    marginBottom: 4,
+    marginRight: 10,
+    color: 'white'
+  },
+  postDetailsLine_white: {
+    fontSize: 12,
+    marginBottom: 10,
+    color: 'white',
   },
   title: {
     fontSize: 20,
@@ -239,6 +305,13 @@ var styles = StyleSheet.create({
     alignSelf: 'center',
     marginRight: 15,
     marginLeft: 15
+  },
+  thumbnail_star : {
+    width: 20,
+    height: 20,
+    marginTop: 1,
+    alignSelf: 'flex-end',
+    marginRight: 3
   },
   separator: {
     height: 1,
