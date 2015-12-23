@@ -80,7 +80,7 @@ var todoList= React.createClass({
       <View style={styles.listContainer}>
         <ListView
           dataSource={this.state.dataSource}
-          renderRow={this.renderGroup1}
+          renderRow={this.renderGroup}
           style={styles.listView}
         />
       </View>
@@ -109,7 +109,6 @@ var todoList= React.createClass({
     this.props.navigator.push({
       title: 'ICO',
       component: todoDetail,
-      //leftButtonTitle: 'Custom Left',
       onLeftButtonPress: () => this.props.navigator.pop(),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',
@@ -129,24 +128,8 @@ var todoList= React.createClass({
     });
   },
   
-  /**
-   * 绘制group
-   * added by ql_wu
-   */
-  renderGroup: function(group) {
-    return (
-      <View style={styles.container}>
-        <Image
-          source={require('./../../img/icon_group_todo.jpg')}
-          style={styles.thumbnail}
-        />
-        <View style={styles.rightContainer}>
-          <Text style={styles.title} onPress={this.todoListPage.bind(this,group.id)}>{group.name}</Text>
-        </View>
-      </View>
-    );
-  },
-  renderGroup1: function(rowData: string, sectionID: number, rowID: number) {
+  
+  renderGroup: function(rowData: string, sectionID: number, rowID: number) {
     var rowHash = Math.abs(hashCode(rowData));
     var imgSource= require('./../../img/t_yang.jpg');
     return (
