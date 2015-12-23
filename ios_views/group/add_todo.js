@@ -52,7 +52,7 @@ module.exports = React.createClass({
           clearButtonMode={'always'}
           keyboardType={'default'}
           multiline={true}
-          placeholder="Todo content..."
+          placeholder="Todo Title..."
           onChangeText={(text) => this.setState({title: text})}
         />
         <View style={styles.separator} />
@@ -79,7 +79,7 @@ module.exports = React.createClass({
         <View style={styles.separator} />
 
         <Button
-        style={{fontSize: 15, color: 'white',backgroundColor: '1E90FF',padding:15,marginTop:40}}
+        style={{fontSize: 15, color: 'white',backgroundColor: '1E90FF',padding:15}}
         styleDisabled={{color: 'red'}}
         onPress={this.addTodo}
         >
@@ -133,7 +133,7 @@ var styles = StyleSheet.create({
     marginTop:44,
     //justifyContent: 'center',
     //alignItems: 'center',
-    backgroundColor: '#808080',
+    backgroundColor: '#FFF',
   },
   title: {
     fontSize:15,
