@@ -26,6 +26,7 @@ var {
 
 module.exports = React.createClass({
   getInitialState: function() {
+
     return {
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
@@ -198,21 +199,22 @@ module.exports = React.createClass({
    * 跳转：组织下todo list画面
    * added by ql_wu
    */
-  todoListPage: function(group_code){
+  todoListPage: function(group_code, user_code){
     this.props.navigator.push({
       title: group_code,
       component: TodoList,
       onLeftButtonPress: () => this.props.navigator.pop(),
       rightButtonIcon: this.state.shareIcon,
       onRightButtonPress: () => this.props.navigator.push({
-        title: 'NewTodo',
+        title: 'タスク追加',
         component: AddToDo,
         leftButtonTitle: 'Cancel',
         onLeftButtonPress: () => this.props.navigator.pop(),
       }),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',
-        id: group_code
+        group_code : group_code,
+        user_code : user_code
       }
     });
   },
@@ -250,7 +252,7 @@ module.exports = React.createClass({
     }
 
     return (
-      <TouchableHighlight onPress={() => this.todoListPage(rowData.group_name_short)}>
+      <TouchableHighlight onPress={() => this.todoListPage(rowData.group_name_short, this.props.user_code)}>
         <View style={styles.container}>
           <Image style={styles.thumbnail} source={imageURL} />
 
@@ -288,7 +290,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   listView: {
-    backgroundColor: '#F8F8FF',
+    backgroundColor: 'white',
   },
   text: {
     flex: 1,

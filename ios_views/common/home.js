@@ -50,7 +50,9 @@ var home = React.createClass({
           initialRoute={{
             component: this.state.selectedTab,
             title: title,
-            passProps: {filter: category},
+            passProps: {
+              filter: category,
+              user_code: "b_wang"},
             rightButtonTitle: "➕",
             onRightButtonPress: this.onRightButtonPress
           }}
@@ -66,7 +68,9 @@ var home = React.createClass({
           initialRoute={{
             component: this.state.selectedTab,
             title: title,
-            passProps: {filter: category}
+            passProps: {
+              filter: category,
+              user_code: "b_wang"}
           }}
         />
       );
