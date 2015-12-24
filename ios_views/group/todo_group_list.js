@@ -208,8 +208,8 @@ module.exports = React.createClass({
       onRightButtonPress: () => this.props.navigator.push({
         title: 'タスク追加',
         component: AddToDo,
+        leftButtonTitle: 'Cancel',
         onLeftButtonPress: () => this.props.navigator.pop(),
-
       }),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',

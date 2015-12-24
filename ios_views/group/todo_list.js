@@ -174,7 +174,6 @@ var todoList= React.createClass({
     this.props.navigator.push({
       title: 'タスク詳細',
       component: todoDetail,
-      //leftButtonTitle: 'Custom Left',
       onLeftButtonPress: () => this.props.navigator.pop(),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',
@@ -183,6 +182,7 @@ var todoList= React.createClass({
     });
   },
   
+
   renderTask: function(rowData: string, sectionID: number, rowID: number) {
     
     var imgSource = '';
@@ -212,7 +212,6 @@ var todoList= React.createClass({
     }
     
     var taskBody = rowData.task_body.length > 15 ? rowData.task_body.substr(0, 15) + '...' : rowData.task_body.substr(0, 15)
-
     return (
       
         <View style={styles.container}>
