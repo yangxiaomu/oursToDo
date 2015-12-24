@@ -36,7 +36,7 @@ module.exports = React.createClass({
   },
 
   componentWillMount: function() {
-    Icon.getImageSource('plus-circle', 20)
+    Icon.getImageSource('plus-circle', 12)
       .then((source) => {
         this.setState({ shareIcon: source })
       });
