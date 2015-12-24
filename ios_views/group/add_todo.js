@@ -9,6 +9,7 @@ var React = require('react-native');
 var Header = require('./../common/header');
 var Button = require('react-native-button');
 var Icon = require("react-native-vector-icons/FontAwesome");
+var Modal = require('react-native-modalbox');
 
 var Dimensions = require('Dimensions');
 var windowSize = Dimensions.get('window');
@@ -27,14 +28,29 @@ var {
 
 module.exports = React.createClass({
   getInitialState: function() {
+    this.state = {
+      isModalOpen: false
+    };
     return {
       title: '',
       content: '',
       deadline: new Date(),
       timeZoneOffsetInHours: (-1) * (new Date()).getTimezoneOffset() / 60,
       remindDate: '',
+      importance:'',
       user_pass: '',
+      isOpen: false,
+      isDisabled: false,
     }
+  },
+  openModal2: function(id) {
+    this.refs.modal3.open();
+  },
+  openModal3: function(id) {
+    this.refs.modal3.open();
+  },
+  toggleDisable: function() {
+    this.setState({isDisabled: !this.state.isDisabled});
   },
 
   onDateChange: function(date) {
@@ -71,9 +87,14 @@ module.exports = React.createClass({
         <View style={styles.separator} />
 
         <View style={styles.buttons}>
-          <Icon.Button name="calendar" backgroundColor="#f8f8ff" onPress={this.setDeadline}>
+          <Icon.Button name="calendar" backgroundColor="#a5de37" onPress={this.openModal2}>
+          期間
           </Icon.Button>
-          <Icon.Button name="bell-o" backgroundColor="#f8f8ff" onPress={this.setRemind}>
+          <Icon.Button name="bell-o" backgroundColor="#a5de37" onPress={this.openModal3}>
+          通知
+          </Icon.Button>
+          <Icon.Button name="flag-o" backgroundColor="#a5de37" onPress={this.setImprotance}>
+          重要度
           </Icon.Button>
         </View>
         <View style={styles.separator} />
@@ -85,8 +106,35 @@ module.exports = React.createClass({
         >
           Add
         </Button>
+        <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal3"} isDisabled={this.state.isDisabled}>
+          <View style={styles.buttons}>
+            <Icon.Button name="calendar" backgroundColor="#a5de37" onPress={this.deleteDeadline}/>
+            <Text>Deadline</Text>
+            <Icon.Button name="bell" backgroundColor="#a5de37" onPress={this.addDeadline}/>
+
+          </View>
+          
+          <DatePickerIOS
+            date={this.state.deadline}
+            mode="datetime"
+            timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
+            onDateChange={this.onDateChange}
+          />
+        </Modal>
       </View>
     );
+  },
+
+  setDeadline: function() {
+
+  },
+
+  setRemind: function() {
+
+  },
+
+  setImprotance: function() {
+
   },
 
   addTodo: function() {
@@ -94,8 +142,6 @@ module.exports = React.createClass({
     var content = this.state.content;
     var deadline = this.state.deadline;
     var remindDate = this.state.remindDate;
-
-
   }
 });
 
@@ -184,6 +230,15 @@ var styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: 'row',
-    backgroundColor: 'f8f8ff',
-  }
+    backgroundColor: 'fff',
+    margin:5,
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modal3: {
+    height: 300,
+    width: 320
+  },
 });
