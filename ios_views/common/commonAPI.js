@@ -95,6 +95,8 @@ var commonAPI = {
 
   	createTask: function(doc){
 		var result = {};
+		result["record_id"] = doc.id;
+		
 		if (!_.isUndefined(doc)) {
 			_.each(doc["item"],function(item){
 				if(item["key"] == "task_code"){

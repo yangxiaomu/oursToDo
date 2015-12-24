@@ -39,14 +39,14 @@ var todoList= React.createClass({
   },
 
   componentWillMount: function() {
-    Icon.getImageSource('star', 30)
+    Icon.getImageSource('thumbs-up', 30)
       .then((source) => {
-        this.setState({ starIcon: source })
+        this.setState({ haveIcon: source })
     });
 
-    Icon.getImageSource('star-o', 30)
+    Icon.getImageSource('thumbs-o-up', 30)
     .then((source) => {
-      this.setState({ starOIcon: source })
+      this.setState({ haveOIcon: source })
     });
   },
 
@@ -205,26 +205,110 @@ var todoList= React.createClass({
       titleCSS = styles.postTitle_white;
       bodyCSS = styles.postDetailsLine_white;
     }
+
+    var displayIcon = this.state.haveIcon;
+    if(rowData.user_code == "") {
+      displayIcon = this.state.haveOIcon;
+    }
     
     var taskBody = rowData.task_body.length > 15 ? rowData.task_body.substr(0, 15) + '...' : rowData.task_body.substr(0, 15)
 
     return (
-      <TouchableHighlight onPress={() => this.goToTaskDetail(rowData.task_code)}>
+      
         <View style={styles.container}>
-          <Image style={styles.thumbnail} source={imgSource} />
+
+          <TouchableHighlight onPress={() => this.goToTaskDetail(rowData.task_code)}>
+            <Image style={styles.thumbnail} source={imgSource} />
+          </TouchableHighlight>
+
           <View style={backgroundCSS}>
-            <Text style={titleCSS}>
-              {rowData.task_title}
-            </Text>
-            <Text style={bodyCSS}>
-              {taskBody}
-            </Text>
+
+            <TouchableHighlight onPress={() => this.goToTaskDetail(rowData.task_code)}>
+              <Text style={titleCSS}>
+                {rowData.task_title}
+              </Text>
+            </TouchableHighlight>
+
+            <TouchableHighlight onPress={() => this.goToTaskDetail(rowData.task_code)}>
+              <Text style={bodyCSS}>
+                {taskBody}
+              </Text>
+             </TouchableHighlight>
+
             <View style={styles.separator} />
+
           </View>
+
+          <TouchableHighlight onPress={() => this.updateTask('b_wang', rowData.record_id)}>
+            <View style={{paddingTop: 10}}>
+              <Image style={styles.thumbnail_star} source={displayIcon}/>
+            </View>
+          </TouchableHighlight>
+
         </View>
-      </TouchableHighlight>
+
+     
     );
   },
+
+  updateTask(user_code, record_id) {
+    var url = 'http://agc.dreamarts.com.cn/hibiki/rest/1/session';
+    fetch(url , {
+      method: 'POST',
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      },
+      body: JSON.stringify({
+        loginid: "b_wang",
+        password: "b_wang"
+      })
+    }).then(
+      function(response) {
+        console.log(response);
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          console.log(response);
+        }
+      }
+    )
+    .catch(function(err) {
+      AlertIOS.alert("システムエラー");
+    });
+
+
+    // var url = 'agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + record_id;
+    // fetch(url , {
+    //   method: 'POST',
+    //   headers:{
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //     'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+    //   },
+    //   body: JSON.stringify({
+    //     user_code: user_code,
+    //     _method: "PUT"
+    //   })
+    // }).then(
+    //   function(response) {
+    //     if (response.status === 401) {
+    //       AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+    //     }
+    //     if (response.status === 200) {
+    //       this.getTaskAPI();
+    //     }
+    //   }
+    // )
+    // .catch(function(err) {
+    //   if(err) {
+    //     console.log(err);
+    //   }
+    // });
+  },
+
 });
 
 var styles = StyleSheet.create({
@@ -307,8 +391,8 @@ var styles = StyleSheet.create({
     marginLeft: 15
   },
   thumbnail_star : {
-    width: 20,
-    height: 20,
+    width: 25,
+    height: 25,
     marginTop: 1,
     alignSelf: 'flex-end',
     marginRight: 3
