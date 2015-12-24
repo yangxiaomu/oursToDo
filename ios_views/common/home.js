@@ -84,6 +84,7 @@ var home = React.createClass({
         <Icon.TabBarItem
           title="oursToDo"
           iconName="group"
+          iconSize={11}
           selectedIconName="group"
           selected={this.state.selectedTab == oursToDo}
           onPress={() => {
@@ -98,6 +99,7 @@ var home = React.createClass({
         <Icon.TabBarItem
           title="統計"
           iconName="bar-chart"
+          iconSize={11}
           selectedIconName="bar-chart"
           selected={this.state.selectedTab == Summary}
           onPress={() => {
