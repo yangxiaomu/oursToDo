@@ -251,62 +251,49 @@ var todoList= React.createClass({
   },
 
   updateTask(user_code, record_id) {
-    var url = 'http://agc.dreamarts.com.cn/hibiki/rest/1/session';
-    fetch(url , {
-      method: 'POST',
-      headers:{
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
-      },
-      body: JSON.stringify({
-        loginid: "b_wang",
-        password: "b_wang"
-      })
-    }).then(
-      function(response) {
-        console.log(response);
-        if (response.status === 401) {
-          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
-        }
-        if (response.status === 200) {
-          console.log(response);
-        }
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
       }
-    )
-    .catch(function(err) {
-      AlertIOS.alert("システムエラー");
-    });
+      if (request.status === 200) {
+        var csrfToken = JSON.parse(request.responseText).csrfToken;
+        // 担当者更新
+        request = null;
+        this._udpateTask(csrfToken, user_code, record_id);
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
 
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
 
-    // var url = 'agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + record_id;
-    // fetch(url , {
-    //   method: 'POST',
-    //   headers:{
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json',
-    //     'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
-    //   },
-    //   body: JSON.stringify({
-    //     user_code: user_code,
-    //     _method: "PUT"
-    //   })
-    // }).then(
-    //   function(response) {
-    //     if (response.status === 401) {
-    //       AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
-    //     }
-    //     if (response.status === 200) {
-    //       this.getTaskAPI();
-    //     }
-    //   }
-    // )
-    // .catch(function(err) {
-    //   if(err) {
-    //     console.log(err);
-    //   }
-    // });
   },
+
+  _udpateTask: function(csrfToken, user_code, record_id) {
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        this.getTaskAPI();
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + record_id + "?user_code=b_wang&_method=PUT&csrfToken=" + csrfToken, true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
+    
+  }
 
 });
 
