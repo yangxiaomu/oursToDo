@@ -188,6 +188,7 @@ module.exports = React.createClass({
     var content = this.state.content;
     var deadline = this.state.deadline;
     var remindDate = this.state.remindDate;
+    this.props.navigator.pop();
   }
 });
 
