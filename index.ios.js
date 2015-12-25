@@ -24,7 +24,7 @@ var oursToDo = React.createClass({
   render: function() {
     var firstComponent;
     if (debug) {
-      firstComponent=home;
+      firstComponent=addTodo;
     } else {
       firstComponent=login;
     }

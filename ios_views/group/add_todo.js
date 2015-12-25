@@ -14,7 +14,6 @@ var Modal = require('react-native-modalbox');
 var Dimensions = require('Dimensions');
 var windowSize = Dimensions.get('window');
 
-
 var {
   AppRegistry,
   StyleSheet,
@@ -23,8 +22,19 @@ var {
   Image,
   TextInput,
   DatePickerIOS,
+  PickerIOS,
   TouchableHighlight
 } = React;
+
+var PickerItemIOS = PickerIOS.Item;
+
+var IMPORTANCE = ['','低','中','高'];
+var CAR_MAKES_AND_MODELS = {
+  amc: {
+    name: 'AMC',
+    models: ['','低','中','高'],
+  },
+};
 
 module.exports = React.createClass({
   getInitialState: function() {
@@ -35,29 +45,38 @@ module.exports = React.createClass({
       title: '',
       content: '',
       deadline: new Date(),
-      timeZoneOffsetInHours: (-1) * (new Date()).getTimezoneOffset() / 60,
       remindDate: '',
+      selectDate: new Date(),
       importance:'',
+      carMake: 'amc',
+      modelIndex: 0,
       user_pass: '',
       isOpen: false,
       isDisabled: false,
+      modalType:'',
     }
   },
-  openModal2: function(id) {
-    this.refs.modal3.open();
+  openModalDeadline: function(id) {
+    this.setState({modalType: 1});
+    this.refs.modal.open();
   },
-  openModal3: function(id) {
-    this.refs.modal3.open();
+  openModalRemind: function(id) {
+    this.setState({modalType: 2});
+    this.refs.modal.open();
+  },
+  openModalImportance: function(id) {
+    this.refs.modal2.open();
   },
   toggleDisable: function() {
     this.setState({isDisabled: !this.state.isDisabled});
   },
 
   onDateChange: function(date) {
-    this.setState({date: date});
+    this.setState({selectDate: date});
   },
 
   render: function() {
+    var make = CAR_MAKES_AND_MODELS[this.state.carMake];
     return (
       <View style={styles.container}>
         <Heading label="タイトル" />
@@ -87,13 +106,13 @@ module.exports = React.createClass({
         <View style={styles.separator} />
 
         <View style={styles.buttons}>
-          <Icon.Button name="calendar" backgroundColor="#a5de37" onPress={this.openModal2}>
+          <Icon.Button name="calendar" backgroundColor="#a5de37" onPress={this.openModalDeadline}>
           期間
           </Icon.Button>
-          <Icon.Button name="bell-o" backgroundColor="#a5de37" onPress={this.openModal3}>
+          <Icon.Button name="bell-o" backgroundColor="#a5de37" onPress={this.openModalRemind}>
           通知
           </Icon.Button>
-          <Icon.Button name="flag-o" backgroundColor="#a5de37" onPress={this.setImprotance}>
+          <Icon.Button name="flag-o" backgroundColor="#a5de37" onPress={this.openModalImportance}>
           重要度
           </Icon.Button>
         </View>
@@ -106,35 +125,62 @@ module.exports = React.createClass({
         >
           Add
         </Button>
-        <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal3"} isDisabled={this.state.isDisabled}>
-          <View style={styles.buttons}>
+        <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
+          <View style={styles.modalHeader}>
             <Icon.Button name="calendar" backgroundColor="#a5de37" onPress={this.deleteDeadline}/>
-            <Text>Deadline</Text>
-            <Icon.Button name="bell" backgroundColor="#a5de37" onPress={this.addDeadline}/>
+            <Text>{this.state.modalType == 1 ? "deadline" : "remindDate"}</Text>
+            <Icon.Button name="bell" backgroundColor="#a5de37" onPress={this.setDate}/>
 
           </View>
-          
+          <View style={styles.separator} />
+
+
           <DatePickerIOS
             date={this.state.deadline}
             mode="datetime"
-            timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
             onDateChange={this.onDateChange}
           />
+        </Modal>
+
+        <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal2"} isDisabled={this.state.isDisabled}>
+          <View style={styles.modalHeader}>
+            <Text/>
+            <Text>importance</Text>
+            <Icon.Button name="bell" backgroundColor="#a5de37" onPress={this.setImprotance}/>
+          </View>
+          <View style={styles.separator} />
+
+          <PickerIOS
+          selectedValue={this.state.modelIndex}
+          key={this.state.carMake}
+          onValueChange={(modelIndex) => this.setState({modelIndex})}>
+          {CAR_MAKES_AND_MODELS[this.state.carMake].models.map(
+            (modelName, modelIndex) => (
+              <PickerItemIOS
+                key={this.state.carMake + '_' + modelIndex}
+                value={modelIndex}
+                label={modelName}
+              />
+            ))
+          }
+        </PickerIOS>
         </Modal>
       </View>
     );
   },
 
-  setDeadline: function() {
-
-  },
-
-  setRemind: function() {
-
+  setDate: function() {
+    if (this.state.modalType == 1) {
+      this.setState({deadline: this.state.selectDate});
+    } else {
+      this.setState({remindDate: this.state.selectDate});
+    };
+    this.refs.modal.close();
   },
 
   setImprotance: function() {
-
+    this.setState({importance:this.state.modelIndex});
+    this.refs.modal2.close();   
   },
 
   addTodo: function() {
@@ -232,13 +278,20 @@ var styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'fff',
     margin:5,
+    justifyContent:'space-between',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    margin:0,
+    justifyContent:'space-between',
+    backgroundColor:'#f8f8ff',
   },
   modal: {
-    justifyContent: 'center',
-    alignItems: 'center'
+    //justifyContent: 'center',
+    //alignItems: 'center'
   },
   modal3: {
-    height: 300,
+    height: 200,
     width: 320
   },
 });
