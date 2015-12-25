@@ -37,6 +37,13 @@ var CAR_MAKES_AND_MODELS = {
 };
 
 module.exports = React.createClass({
+  getDefaultProps: function () {
+    return {
+      date: new Date(),
+      timeZoneOffsetInHours: (-1) * (new Date()).getTimezoneOffset() / 60,
+    };
+  },
+
   getInitialState: function() {
     this.state = {
       isModalOpen: false
@@ -44,9 +51,10 @@ module.exports = React.createClass({
     return {
       title: '',
       content: '',
-      deadline: new Date(),
+      deadline:'',
+      timeZoneOffsetInHours: this.props.timeZoneOffsetInHours,
       remindDate: '',
-      selectDate: new Date(),
+      selectDate: this.props.date,
       importance:'',
       carMake: 'amc',
       modelIndex: 0,
@@ -72,7 +80,12 @@ module.exports = React.createClass({
   },
 
   onDateChange: function(date) {
-    this.setState({selectDate: date});
+   //  if (this.state.modalType == 1) {
+   //    this.setState({deadline: date});
+   //  } else {
+   //    this.setState({remindDate: date});
+   // };
+       this.setState({selectDate: date});
   },
 
   render: function() {
@@ -136,8 +149,9 @@ module.exports = React.createClass({
 
 
           <DatePickerIOS
-            date={this.state.deadline}
-            mode="datetime"
+            date={this.state.selectDate}
+            mode={this.state.modalType == 1 ? "date" : "datetime"}
+            timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
             onDateChange={this.onDateChange}
           />
         </Modal>
@@ -188,20 +202,22 @@ module.exports = React.createClass({
     var content = this.state.content;
     var deadline = this.state.deadline;
     var remindDate = this.state.remindDate;
+
+    console.log(deadline+remindDate);
     this.props.navigator.pop();
   }
 });
 
-var　DatePicker = React.createClass({
-  render: function() {
-    <DatePickerIOS
-      date={this.state.deadline}
-      mode="datetime"
-      timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
-      onDateChange={this.onDateChange}
-    />
-  }
-});
+// var　DatePicker = React.createClass({
+//   render: function() {
+//     <DatePickerIOS
+//       date={this.state.deadline}
+//       mode="datetime"
+//       timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
+//       onDateChange={this.onDateChange}
+//     />
+//   }
+// });
 
 var Heading = React.createClass({
   render: function() {
