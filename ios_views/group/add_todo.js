@@ -119,15 +119,17 @@ module.exports = React.createClass({
         <View style={styles.separator} />
 
         <View style={styles.buttons}>
-          <Icon.Button name="calendar" backgroundColor="#a5de37" onPress={this.openModalDeadline}>
-          期間
-          </Icon.Button>
-          <Icon.Button name="bell-o" backgroundColor="#a5de37" onPress={this.openModalRemind}>
-          通知
-          </Icon.Button>
-          <Icon.Button name="flag-o" backgroundColor="#a5de37" onPress={this.openModalImportance}>
-          重要度
-          </Icon.Button>
+          <TouchableHighlight onPress={this.openModalDeadline} activeOpacity={0.4} underlayColor="#f8f8ff">
+            <Icon name="calendar" style={styles.iconButton} size={20} />
+          </TouchableHighlight>
+
+          <TouchableHighlight onPress={this.openModalRemind} activeOpacity={0.4} underlayColor="#f8f8ff">
+            <Icon name="bell-o" style={styles.iconButton} size={20} />
+          </TouchableHighlight>
+
+          <TouchableHighlight onPress={this.openModalImportance} activeOpacity={0.4} underlayColor="#f8f8ff">
+            <Icon name="flag-o" style={styles.iconButton} size={20} />
+          </TouchableHighlight>
         </View>
         <View style={styles.separator} />
 
@@ -140,9 +142,9 @@ module.exports = React.createClass({
         </Button>
         <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
           <View style={styles.modalHeader}>
-            <Icon.Button name="calendar" backgroundColor="#a5de37" onPress={this.deleteDeadline}/>
+            <Icon.Button name="trash-o" backgroundColor="#a5de37" onPress={this.deleteDeadline}/>
             <Text>{this.state.modalType == 1 ? "deadline" : "remindDate"}</Text>
-            <Icon.Button name="bell" backgroundColor="#a5de37" onPress={this.setDate}/>
+            <Icon.Button name="check" backgroundColor="#a5de37" onPress={this.setDate}/>
 
           </View>
           <View style={styles.separator} />
@@ -160,7 +162,7 @@ module.exports = React.createClass({
           <View style={styles.modalHeader}>
             <Text/>
             <Text>importance</Text>
-            <Icon.Button name="bell" backgroundColor="#a5de37" onPress={this.setImprotance}/>
+            <Icon.Button name="check" backgroundColor="#a5de37" onPress={this.setImprotance}/>
           </View>
           <View style={styles.separator} />
 
@@ -293,9 +295,13 @@ var styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: 'row',
-    backgroundColor: 'fff',
-    margin:5,
-    justifyContent:'space-between',
+    backgroundColor: 'f8f8ff',
+    //margin:5,
+    //justifyContent:'space-between',
+  },
+  iconButton: {
+    color:"#DA552F",
+    margin:10,
   },
   modalHeader: {
     flexDirection: 'row',
