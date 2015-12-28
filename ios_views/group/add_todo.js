@@ -85,7 +85,7 @@ module.exports = React.createClass({
    //  } else {
    //    this.setState({remindDate: date});
    // };
-       this.setState({selectDate: date});
+   this.setState({selectDate: date});
   },
 
   render: function() {
@@ -200,14 +200,79 @@ module.exports = React.createClass({
   },
 
   addTodo: function() {
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        var csrfToken = JSON.parse(request.responseText).csrfToken;
+        // 担当者更新
+        request = null;
+        this._addTodo(csrfToken);
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
+
+  },
+
+  _addTodo: function(csrfToken) {
+
     var title = this.state.title;
     var content = this.state.content;
     var deadline = this.state.deadline;
     var remindDate = this.state.remindDate;
+    var importance = this.state.importance;
+    var task_code = Math.floor(Math.random()*99999999);
+    var group_code = this.props.group_code;
 
-    console.log(deadline+remindDate);
-    this.props.navigator.pop();
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        this.props.navigator.pop();
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    var bodyObj = '?task_code=' + task_code + "&csrfToken=" + csrfToken + "&task_title=" + title + "&task_body=" + content + "&group_code=" + group_code + "&task_status=2";
+    if(deadline) {
+      var year = deadline.getFullYear();
+      var month = deadline.getMonth() + 1;
+      var day = deadline.getDate();
+      var endDate = year + "-" + month + "-" + day;
+      bodyObj += "&endDate=" + endDate;
+    }
+    if(remindDate) {
+      var year = remindDate.getFullYear();
+      var month = remindDate.getMonth() + 1;
+      var day = remindDate.getDate();
+      var endDate = year + "-" + month + "-" + day;
+      var hour = remindDate.getHours();
+      var minute = remindDate.getMinutes();
+      var remindDate = endDate + "T" + hour + ":" + minute + ":" + "01";
+      bodyObj += "&remindDate=" + remindDate;
+    }
+    if(importance) {
+      bodyObj += "&task_level=" + importance;
+    }
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents' + bodyObj);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
+    
   }
+
 });
 
 // var　DatePicker = React.createClass({
