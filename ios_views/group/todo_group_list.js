@@ -200,6 +200,7 @@ module.exports = React.createClass({
    * added by ql_wu
    */
   todoListPage: function(group_code, user_code){
+
     this.props.navigator.push({
       title: group_code,
       component: TodoList,
@@ -210,6 +211,10 @@ module.exports = React.createClass({
         component: AddToDo,
         leftButtonTitle: 'Cancel',
         onLeftButtonPress: () => this.props.navigator.pop(),
+        passProps: {
+          group_code : group_code,
+          user_code : user_code
+        }
       }),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',

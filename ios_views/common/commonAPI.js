@@ -123,6 +123,12 @@ var commonAPI = {
 				else if(item["key"] == "finish_date"){
 					result["finish_date"] = item["value"];
 				}
+				else if(item["key"] == "remindDate"){
+					result["remindDate"] = item["value"];
+				}
+				else if(item["key"] == "task_level"){
+					result["task_level"] = item["value"];
+				}
 			});
 		}
 		return result;
