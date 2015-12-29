@@ -21,7 +21,8 @@ var {
   TextInput,
   AlertIOS,
   Navigator,
-  TouchableHighlight
+  TouchableHighlight,
+  AsyncStorage
 } = React;
 
 module.exports = React.createClass({
@@ -43,17 +44,25 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function() {
-    this.getGroupByAPI();
+    AsyncStorage.getItem("user_code").then((value) => {
+      this.setState({
+        user_code: value.toLowerCase()
+      });
+
+      this.getGroupByAPI();
+      
+    }).done();
+    
   },
-  
-  /**
+ 
+ /**
    * 从smartDB restAPI获取组织列表
    * added by ql_wu
    */
   getGroupByAPI: function() {
     var tempThis = this;
 
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents?members=' + 'b_wang', {
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents?members=' + this.state.user_code, {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',

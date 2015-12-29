@@ -13,7 +13,8 @@ var {
   TextInput,
   Image,
   AlertIOS,
-  TouchableHighlight
+  TouchableHighlight,
+  AsyncStorage
 } = React;
 
 var login = React.createClass({
@@ -86,6 +87,7 @@ var login = React.createClass({
         if (response.status === 200) {
           var result = JSON.parse(response._bodyText);
           if (parseInt(result.totalCount) > 0) {
+            AsyncStorage.setItem("user_code", user_code);
             temp.props.navigator.push({
               component: home,
               passProps: {
