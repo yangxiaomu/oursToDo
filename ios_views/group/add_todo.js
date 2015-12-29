@@ -264,14 +264,14 @@ module.exports = React.createClass({
     };
 
     var bodyObj = '?task_code=' + task_code + "&csrfToken=" + csrfToken + "&task_title=" + title + "&task_body=" + content + "&group_code=" + group_code + "&task_status=2";
-    if(deadline) {
+    if(deadline != "0") {
       var year = deadline.getFullYear();
       var month = deadline.getMonth() + 1;
       var day = deadline.getDate();
       var endDate = year + "-" + month + "-" + day;
       bodyObj += "&endDate=" + endDate;
     }
-    if(remindDate) {
+    if(remindDate != "0") {
       var year = remindDate.getFullYear();
       var month = remindDate.getMonth() + 1;
       var day = remindDate.getDate();
