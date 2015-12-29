@@ -154,6 +154,13 @@ module.exports = React.createClass({
           >
             认领
           </Button>
+          <Button
+          style={styles.update}
+          styleDisabled={{color: 'red'}}
+          onPress={this.take}
+          >
+            完了
+          </Button>
         </View>
 
         <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
