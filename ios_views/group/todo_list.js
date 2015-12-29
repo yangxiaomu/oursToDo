@@ -70,9 +70,9 @@ var todoList= React.createClass({
    */
   getTaskAPI: function() {
 
-    this.setState({
-      loaded: false
-    })
+    // this.setState({
+    //   loaded: false
+    // })
 
     var tempThis = this;
     var user_code = this.props.user_code;
@@ -130,7 +130,7 @@ var todoList= React.createClass({
 
           tempThis.setState({
             dataSource: tempThis.state.dataSource.cloneWithRows(selectedTasks),
-            loaded: true,
+            loaded: true
           });
 
         }
