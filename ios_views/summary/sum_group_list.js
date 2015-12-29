@@ -21,97 +21,297 @@ var {
   Text,
   View,
   ListView,
-  AlertIOS
+  AlertIOS,
+  AsyncStorage
 } = React;
 
 var PickerItemIOS = PickerIOS.Item;
-
-var CAR_MAKES_AND_MODELS = {
-  amc: {
-    name: 'AMC',
-    models: ['AMX', 'Concord', 'Eagle', 'Gremlin', 'Matador', 'Pacer'],
-  },
-  alfa: {
-    name: 'Alfa-Romeo',
-    models: ['159', '4C', 'Alfasud', 'Brera', 'GTV6', 'Giulia', 'MiTo', 'Spider'],
-  }
-};
 
 module.exports = React.createClass({
 
   getInitialState: function() {
     return {
-      carMake: 'amc',
-      modelIndex: 0,
+      loaded: false,
+      valueChanged: false
     };
+  },
+
+  componentDidMount: function() {
+
+    AsyncStorage.getItem("user_code").then((value) => {
+      this.setState({
+        user_code: value.toLowerCase()
+      });
+
+      this.getGroupList();
+      
+    }).done();
+    
+  },
+
+  getGroupList: function() {
+
+    var tempThis = this;
+
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents?members=' + this.state.user_code, {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result);
+          var groups = {};
+          _.each(result.document, function(group, index) {
+            var group = commonAPI.createGroup(group);
+            if(!tempThis.state.index) {
+              if(index == 0) {
+                tempThis.setState({
+                  index: group.group_code
+                });
+              }
+            } 
+            
+            groups[group.group_code] = {name: group.group_name};
+          });
+          tempThis.setState({
+            groups: groups
+          });
+
+          tempThis.getGroupUsers();
+
+        }
+      }
+    )
+    .done();
+  },
+
+  getGroupUsers: function() {
+
+    this.setState({
+      loaded: false
+    })
+
+    var tempThis = this;
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents?group_code=' + this.state.index, {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result);
+          var users = [];
+          var totalGroups = {};
+          _.each(result.document, function(group, index) {
+            var group = commonAPI.createGroup(group);
+
+            if(index == 0) {
+              totalGroups.group_code = group.group_code;
+            }
+ 
+            users.push(group.members);
+          });
+          totalGroups.users = users;
+          
+          tempThis.getTaskAPI(totalGroups)
+        }
+      }
+    )
+    .done();
+  },
+
+  getTaskAPI: function(totalGroups) {
+    var tempThis = this;
+
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents?task_status=1&group_code=' + totalGroups.group_code + "&sort=finish_date:DESC", {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result);
+          var tasks = [];
+          _.each(result.document, function(task, index) {
+            var task = commonAPI.createTask(task);
+            tasks.push(task);
+          });
+
+          var memberTasks = [];
+          _.each(totalGroups.users, function(user,index) {
+            memberTasks[index] = 0;
+          });
+
+          _.each(tasks, function(task) {
+            _.each(totalGroups.users, function(user, index) {
+              if(task.user_code == user) {
+                memberTasks[index] ++;
+              }
+            });
+          });
+
+          totalGroups.tasks = memberTasks;
+
+          tempThis.setState({
+            loaded: true,
+            totalGroups: totalGroups,
+            valueChanged: false
+          })
+
+
+        }
+      }
+    )
+    .done();
   },
 
   render: function() {
 
-    var make = CAR_MAKES_AND_MODELS[this.state.carMake];
-    var selectionString = make.name + ' ' + make.models[this.state.modelIndex];
+    if(!this.state.loaded){
+      return this.renderLoadingView();
+    }
 
-    var barChart = this.createBarChart();
-    
+    if(this.state.valueChanged) {
+      this.getGroupUsers();
+      return this.renderLoadingView();
+    }
+
+    var totalGroups = this.state.totalGroups;
+
+    var colorList = ['green', 'orange', 'blue', 'red', 'grey'];
+    var dataList = [];
+
+    _.each(totalGroups.users, function(user,index) {
+      console.log(index)
+      var dataObj = {};
+      dataObj.fillColor = colorList[index];
+      dataObj.data = [{value: totalGroups.tasks[index]}];
+      dataObj.name = user;
+      dataList.push(dataObj);
+    });
+
+    var barChart = this.createBarChart(dataList);
+    var userNames = this.createUserNames(dataList);
+
     return (
 
       <View>
-        <Text>Please choose a make for your car:</Text>
         <PickerIOS
-          selectedValue={this.state.carMake}
-          onValueChange={(carMake) => this.setState({carMake, modelIndex: 0})}>
-          {Object.keys(CAR_MAKES_AND_MODELS).map((carMake) => (
+          selectedValue={this.state.index}
+          onValueChange={(group) => this.setState({index: group, valueChanged: true})}>
+          {Object.keys(this.state.groups).map((group) => (
             <PickerItemIOS
-              key={carMake}
-              value={carMake}
-              label={CAR_MAKES_AND_MODELS[carMake].name}
+              key={group}
+              value={group}
+              label={this.state.groups[group].name}
               />
             )
           )}
         </PickerIOS>
 
+        
+
         {barChart}
+
+        {userNames}
 
       </View>
 
     );
   },
 
-  createBarChart: function() {
+  createBarChart: function(dataList) {
 
-    return(
+    var display = false;
+    _.each(dataList, function(data) {
+      if(data.data[0].value != 0) {
+        display = true;
+      }
+    });
 
-      <BarChart
-          dataSets={[
-          {
-            fillColor: '#46b3f7',
-            data: [
-              { value: 15 },
-              { value: 10 },
-              { value: 12 },
-              { value: 11 },
-            ]
-          },
-          {
-            fillColor: '#3386b9',
-            data: [
-              { value: 14 },
-              { value: 11 },
-              { value: 14 },
-              { value: 13 },
-            ]
-          },
-        ]}
-        graduation={1}
-        horizontal={false}
-        showGrid={true}
-        barSpacing={5}
-        style={{
-          height: 200,
-          marginTop: 40,
-        }} />
+    if(display) {
+      return (
 
+        <BarChart
+          dataSets={
+            dataList
+          }
+          graduation={1}
+          horizontal={false}
+          showGrid={true}
+          barSpacing={25}
+          style={{
+            height: 200,
+            marginTop: 40,
+          }} />
+        
       );
+    } else {
+      return (
+        <View style={styles.container}>
+          <Text>
+            完了したタスクがありません。
+          </Text>
+        </View>
+      );
+    }
+
+    
+  },
+
+  createUserNames: function(dataList) {
+    var display = false;
+    var userString = "";
+    _.each(dataList, function(data, index) {
+      
+      userString += "                  " + data.name;
+      
+      if(data.data[0].value != 0) {
+        display = true;
+      }
+    });
+    if(display) {
+      return (
+        <Text style={{color: 'blue'}}>
+        {userString}
+        </Text>
+        );
+    } else {
+      return (
+         <Text style={{color: 'blue'}}>
+        
+        </Text>
+        );
+    }
+  },
+
+  renderLoadingView: function() {
+    return (
+      <View style={styles.container}>
+        <Text>
+          Loading……
+        </Text>
+      </View>
+    );
   },
 
 });

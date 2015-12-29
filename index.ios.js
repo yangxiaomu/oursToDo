@@ -10,13 +10,14 @@ var login = require('./ios_views/login/login.ios');
 //for test by yt delete the code before commit 
 var home = require('./ios_views/common/home');
 var addTodo = require('./ios_views/group/add_todo');
-var debug = false;
+var debug = true;
 
 var {
   AppRegistry,
   StyleSheet,
   View,
-  Navigator
+  Navigator,
+  AsyncStorage
 } = React;
 
 var oursToDo = React.createClass({
@@ -25,6 +26,7 @@ var oursToDo = React.createClass({
     var firstComponent;
     if (debug) {
       firstComponent=home;
+      AsyncStorage.setItem("user_code", "b_wang");
     } else {
       firstComponent=login;
     }
