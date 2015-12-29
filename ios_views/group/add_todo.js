@@ -143,9 +143,9 @@ module.exports = React.createClass({
         </Button>
         <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
           <View style={styles.modalHeader}>
-            <Icon.Button name="trash-o" backgroundColor="#a5de37" onPress={this.deleteDeadline}/>
-            <Text>{this.state.modalType == 1 ? "deadline" : "remindDate"}</Text>
-            <Icon.Button name="check" backgroundColor="#a5de37" onPress={this.setDate}/>
+            <Icon.Button name="trash" backgroundColor="#f8f8ff" color="#000" marginRight={-10} onPress={this.deleteDeadline}/>
+            <Text style={styles.heading,{marginTop:5}}>{this.state.modalType == 1 ? "deadline" : "remindDate"}</Text>
+            <Icon.Button name="check" backgroundColor="#f8f8ff" color="#000" marginRight={-10} onPress={this.setDate}/>
 
           </View>
           <View style={styles.separator} />
@@ -162,8 +162,8 @@ module.exports = React.createClass({
         <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal2"} isDisabled={this.state.isDisabled}>
           <View style={styles.modalHeader}>
             <Text/>
-            <Text>importance</Text>
-            <Icon.Button name="check" backgroundColor="#a5de37" onPress={this.setImprotance}/>
+            <Text style={styles.heading,{marginTop:5,marginLeft:46}}>重要度</Text>
+            <Icon.Button name="check" backgroundColor="#f8f8ff" color="#000" marginRight={-10} onPress={this.setImprotance}/>
           </View>
           <View style={styles.separator} />
 
@@ -191,6 +191,18 @@ module.exports = React.createClass({
       this.setState({deadline: this.state.selectDate});
     } else {
       this.setState({remindDate: this.state.selectDate});
+    };
+    
+    this.setState({selectDate: this.props.date});
+
+    this.refs.modal.close();
+    this.render();
+  },
+  deleteDeadline: function() {
+    if (this.state.modalType == 1) {
+      this.setState({deadline: "0"});
+    } else {
+      this.setState({remindDate: "0"});
     };
     
     this.setState({selectDate: this.props.date});
@@ -359,6 +371,9 @@ var styles = StyleSheet.create({
   heading: {
     fontWeight: '500',
     fontSize: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+
   },
   separator: {
     height: 1,
@@ -377,6 +392,7 @@ var styles = StyleSheet.create({
   modalHeader: {
     flexDirection: 'row',
     margin:0,
+    height:36,
     justifyContent:'space-between',
     backgroundColor:'#f8f8ff',
   },
