@@ -23,7 +23,8 @@ var {
   ScrollView,
   NavigatorIOS,
   StatusBarIOS,
-  AlertIOS
+  AlertIOS,
+  AsyncStorage
 } = React;
 
 StatusBarIOS.setHidden(true);
@@ -33,6 +34,14 @@ var home = React.createClass({
     return {
       selectedTab: oursToDo
     };
+  },
+
+  componentDidMount: function() {
+    AsyncStorage.getItem("user_code").then((value) => {
+      this.setState({
+        user_code: value.toLowerCase()
+      })
+    }).done();
   },
 
   onRightButtonPress: function() {
@@ -52,7 +61,7 @@ var home = React.createClass({
             title: title,
             passProps: {
               filter: category,
-              user_code: "b_wang"},
+              user_code: this.state.user_code},
             rightButtonTitle: "➕",
             onRightButtonPress: this.onRightButtonPress
           }}
@@ -70,7 +79,7 @@ var home = React.createClass({
             title: title,
             passProps: {
               filter: category,
-              user_code: "b_wang"}
+              user_code: this.state.user_code}
           }}
         />
       );

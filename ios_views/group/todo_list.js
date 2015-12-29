@@ -23,7 +23,8 @@ var {
   TextInput,
   AlertIOS,
   TouchableHighlight,
-  SegmentedControlIOS
+  SegmentedControlIOS,
+  AsyncStorage
 } = React;
 
 var todoList= React.createClass({
@@ -51,7 +52,16 @@ var todoList= React.createClass({
   },
 
   componentDidMount: function() {
-    this.getTaskAPI();
+
+    AsyncStorage.getItem("user_code").then((value) => {
+      this.setState({
+        user_code: value.toLowerCase()
+      });
+
+      this.getTaskAPI();
+      
+    }).done();
+    
   },
   
   /**
@@ -100,7 +110,7 @@ var todoList= React.createClass({
           } else if (tempThis.state.selectedIndex == 2) {
             // 自分
             _.each(tasks, function(task) {
-              if(task.user_code == "b_wang") {
+              if(task.user_code == tempThis.state.user_code) {
                 selectedTasks.push(task);
               }
             });
@@ -238,7 +248,7 @@ var todoList= React.createClass({
 
           </View>
 
-          <TouchableHighlight onPress={() => this.updateTask('b_wang', rowData.record_id)}>
+          <TouchableHighlight onPress={() => this.updateTask(this.state.user_code, rowData.record_id)}>
             <View style={{paddingTop: 10}}>
               <Image style={styles.thumbnail_star} source={displayIcon}/>
             </View>
@@ -288,7 +298,7 @@ var todoList= React.createClass({
       }
     };
 
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + record_id + "?user_code=b_wang&_method=PUT&csrfToken=" + csrfToken, true);
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + record_id + "?user_code=" + this.state.user_code + "&_method=PUT&csrfToken=" + csrfToken, true);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/json");
     request.send();
