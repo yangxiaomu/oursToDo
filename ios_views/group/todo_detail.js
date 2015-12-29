@@ -163,11 +163,12 @@ module.exports = React.createClass({
           </Button>
         </View>
 
+
         <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal"} isDisabled={this.state.isDisabled}>
           <View style={styles.modalHeader}>
-            <Icon.Button name="trash-o" backgroundColor="#a5de37" onPress={this.deleteDeadline}/>
-            <Text>{this.state.modalType == 1 ? "deadline" : "remindDate"}</Text>
-            <Icon.Button name="check" backgroundColor="#a5de37" onPress={this.setDate}/>
+            <Icon.Button name="trash" backgroundColor="#f8f8ff" color="#000" marginRight={-10} onPress={this.deleteDeadline}/>
+            <Text style={styles.heading,{marginTop:5}}>{this.state.modalType == 1 ? "deadline" : "remindDate"}</Text>
+            <Icon.Button name="check" backgroundColor="#f8f8ff" color="#000" marginRight={-10} onPress={this.setDate}/>
 
           </View>
           <View style={styles.separator} />
@@ -184,8 +185,8 @@ module.exports = React.createClass({
         <Modal style={[styles.modal, styles.modal3]} position={"center"} ref={"modal2"} isDisabled={this.state.isDisabled}>
           <View style={styles.modalHeader}>
             <Text/>
-            <Text>importance</Text>
-            <Icon.Button name="check" backgroundColor="#a5de37" onPress={this.setImprotance}/>
+            <Text style={styles.heading,{marginTop:5,marginLeft:46}}>重要度</Text>
+            <Icon.Button name="check" backgroundColor="#f8f8ff" color="#000" marginRight={-10} onPress={this.setImprotance}/>
           </View>
           <View style={styles.separator} />
 
@@ -215,6 +216,18 @@ module.exports = React.createClass({
       this.setState({remindDate: this.state.selectDate});
     };
     this.refs.modal.close();
+  },
+  deleteDeadline: function() {
+    if (this.state.modalType == 1) {
+      this.setState({deadline: "0"});
+    } else {
+      this.setState({remindDate: "0"});
+    };
+    
+    this.setState({selectDate: this.props.date});
+
+    this.refs.modal.close();
+    this.render();
   },
 
   setImprotance: function() {
@@ -317,7 +330,7 @@ var styles = StyleSheet.create({
   },
   headingContainer: {
     padding: 4,
-    backgroundColor: '#99ffff',
+    backgroundColor: '#f8f8ff',
   },
   heading: {
     fontWeight: '500',
