@@ -51,9 +51,9 @@ module.exports = React.createClass({
     return {
       title: '',
       content: '',
-      deadline:'',
+      deadline:'0',
       timeZoneOffsetInHours: this.props.timeZoneOffsetInHours,
-      remindDate: '',
+      remindDate: '0',
       selectDate: this.props.date,
       importance:'',
       carMake: 'amc',
@@ -89,6 +89,7 @@ module.exports = React.createClass({
   },
 
   render: function() {
+
     var make = CAR_MAKES_AND_MODELS[this.state.carMake];
     return (
       <View style={styles.container}>
@@ -120,15 +121,15 @@ module.exports = React.createClass({
 
         <View style={styles.buttons}>
           <TouchableHighlight onPress={this.openModalDeadline} activeOpacity={0.4} underlayColor="#f8f8ff">
-            <Icon name="calendar" style={styles.iconButton} size={20} />
+            <Icon name={this.state.deadline == 0 ? "calendar-o" : "calendar"} style={styles.iconButton} size={20} />
           </TouchableHighlight>
 
           <TouchableHighlight onPress={this.openModalRemind} activeOpacity={0.4} underlayColor="#f8f8ff">
-            <Icon name="bell-o" style={styles.iconButton} size={20} />
+            <Icon name={this.state.remindDate == 0 ? "bell-o" : "bell"} style={styles.iconButton} size={20} />
           </TouchableHighlight>
 
           <TouchableHighlight onPress={this.openModalImportance} activeOpacity={0.4} underlayColor="#f8f8ff">
-            <Icon name="flag-o" style={styles.iconButton} size={20} />
+            <Icon name={this.state.importance == 0 ? "flag-o" : "flag"} style={styles.iconButton} size={20} />
           </TouchableHighlight>
         </View>
         <View style={styles.separator} />
@@ -191,12 +192,17 @@ module.exports = React.createClass({
     } else {
       this.setState({remindDate: this.state.selectDate});
     };
+    
+    this.setState({selectDate: this.props.date});
+
     this.refs.modal.close();
+    this.render();
   },
 
   setImprotance: function() {
     this.setState({importance:this.state.modelIndex});
     this.refs.modal2.close();   
+    this.render();
   },
 
   addTodo: function() {

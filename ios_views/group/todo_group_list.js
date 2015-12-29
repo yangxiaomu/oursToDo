@@ -168,6 +168,11 @@ module.exports = React.createClass({
     if(!this.state.loaded){
       return this.renderLoadingView();
     }
+    if (this.props.navigator) {
+      this.props.navigator.navigationContext.addListener('didfocus',(event) => {
+        this.getGroupByAPI();
+      });
+    }
 
     return (
       <View style={styles.listContainer}>

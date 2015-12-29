@@ -128,6 +128,11 @@ var todoList= React.createClass({
     if(!this.state.loaded){
       return this.renderLoadingView();
     }
+    if (this.props.navigator) {
+      this.props.navigator.navigationContext.addListener('didfocus',(event) => {
+        this.getTaskAPI();
+      });
+    }
 
     return (
       <View style={styles.listContainer}>
