@@ -132,7 +132,7 @@ module.exports = React.createClass({
   },
 
   getGroupTasks: function(groups, tempThis) {
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents', {
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents?offset=0&limit=1000000', {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
