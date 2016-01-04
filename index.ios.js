@@ -10,7 +10,7 @@ var login = require('./ios_views/login/login.ios');
 //for test by yt delete the code before commit 
 var home = require('./ios_views/common/home');
 var addTodo = require('./ios_views/group/add_todo');
-var debug = true;
+var debug = false;
 
 var {
   AppRegistry,

@@ -61,6 +61,7 @@ module.exports = React.createClass({
       remindDate: '',
       selectDate: this.props.date,
       status:'',
+      user_code: '',
       importance:'',
       carMake: 'amc',
       modelIndex: 0,
@@ -102,6 +103,7 @@ module.exports = React.createClass({
 
           tempThis.setState({title:task.task_title});
           tempThis.setState({content:task.task_body});
+          tempThis.setState({user_code:task.user_code});
           if (task.endDate) {
             tempThis.setState({deadline:(new Date(task.endDate))});
           } else {
@@ -224,22 +226,25 @@ module.exports = React.createClass({
         <View style={styles.buttons}>
           <Button
           style={styles.update}
-          styleDisabled={{color: 'whitea'}}
+          styleDisabled={{color: 'black'}}
           onPress={this.update}
+          disabled={this.state.changeFlag == 1 ? false : true}
           >
             更新
           </Button>
           <Button
           style={styles.update}
-          styleDisabled={{color: 'red'}}
+          styleDisabled={{color: 'black'}}
           onPress={this.take}
+          disabled={this.state.user_code == "" ? false : true}
           >
             认领
           </Button>
           <Button
           style={styles.update}
-          styleDisabled={{color: 'red'}}
+          styleDisabled={{color: 'black'}}
           onPress={this.finish}
+          disabled={this.state.status == 1 ? true : false}
           >
             完了
           </Button>
@@ -344,16 +349,6 @@ module.exports = React.createClass({
         var user_code = this.props.user_code;
         var record_id = this.props.task_code;
         request = null;
-        // if (1 == type) {
-        //   // 内容更新
-        //   this._udpateTask1(csrfToken, user_code, record_id);
-        // } else if (2 == type) {
-        //   // 担当者更新
-        //   this._udpateTask2(csrfToken, user_code, record_id);
-        // } else if (3 == type) {
-        //   // todo状态更新
-        //   this._udpateTask3(csrfToken, user_code, record_id);
-        // }
         this._udpateTask(csrfToken, user_code, record_id, type);
       } else {
         AlertIOS.alert("システムエラー");
@@ -433,103 +428,6 @@ module.exports = React.createClass({
     request.send();
 
   },
-  // 内容更新
-  _udpateTask1: function(csrfToken, user_code, record_id) {
-    this.setState({
-      loaded: false
-    });
-
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = (e) => {
-      if (request.readyState !== 4) {
-        return;
-      }
-      if (request.status === 200) {
-        this.setState({
-          loaded: true
-        });
-      } else {
-        AlertIOS.alert("システムエラー");
-      }
-    };
-
-    var title = this.state.title;
-    var content = this.state.content;
-    var deadline = this.state.deadline;
-    var remindDate = this.state.remindDate;
-    var importance = this.state.importance;
-
-    var bodyObj = "?_method=PUT&csrfToken=" + csrfToken + "&task_title=" + title + "&task_body=" + content + "&task_status=2";
-    if(deadline != "0") {
-      var year = deadline.getFullYear();
-      var month = deadline.getMonth() + 1;
-      var day = deadline.getDate();
-      var endDate = year + "-" + month + "-" + day;
-      bodyObj += "&endDate=" + endDate;
-    }
-    if(remindDate != "0") {
-      var year = remindDate.getFullYear();
-      var month = remindDate.getMonth() + 1;
-      var day = remindDate.getDate();
-      var endDate = year + "-" + month + "-" + day;
-      var hour = remindDate.getHours();
-      var minute = remindDate.getMinutes();
-      var remindDate = endDate + "T" + hour + ":" + minute + ":" + "01";
-      bodyObj += "&remindDate=" + remindDate;
-    }
-    if(importance) {
-      bodyObj += "&task_level=" + importance;
-    }
-    //1
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + bodyObj);
-    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    request.setRequestHeader("Accept", "application/json");
-    request.send();
-  },
-
-  // 担当者更新
-  _udpateTask2: function(csrfToken, user_code, record_id) {
-
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = (e) => {
-      if (request.readyState !== 4) {
-        return;
-      }
-      if (request.status === 200) {
-        this.props.navigator.pop();
-      } else {
-        AlertIOS.alert("システムエラー");
-      }
-    };
-
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + "?user_code=" + user_code + "&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000", true);
-    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    request.setRequestHeader("Accept", "application/json");
-    request.send();
-
-  },
-
-  // todo状态更新
-  _udpateTask3: function(csrfToken, user_code, record_id) {
-
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = (e) => {
-      if (request.readyState !== 4) {
-        return;
-      }
-      if (request.status === 200) {
-        this.props.navigator.pop();
-      } else {
-        AlertIOS.alert("システムエラー");
-      }
-    };
-
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + "?task_status=1&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000", true);
-    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    request.setRequestHeader("Accept", "application/json");
-    request.send();
-    
-  }
 
 });
 
