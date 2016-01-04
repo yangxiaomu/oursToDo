@@ -24,7 +24,8 @@ var {
   NavigatorIOS,
   StatusBarIOS,
   AlertIOS,
-  AsyncStorage
+  AsyncStorage,
+  ActionSheetIOS
 } = React;
 
 StatusBarIOS.setHidden(true);
@@ -34,6 +35,12 @@ var home = React.createClass({
     return {
       selectedTab: oursToDo
     };
+  },
+  componentWillMount: function() {
+    Icon.getImageSource('share-square-o', 12)
+      .then((source) => {
+        this.setState({ shareIcon: source })
+      });
   },
 
   componentDidMount: function() {
@@ -46,6 +53,28 @@ var home = React.createClass({
 
   onRightButtonPress: function() {
     AlertIOS.alert("すみません、グループ追加機能がまだですよ！Sm@rtDBで追加お願いします。");
+  },
+  onShareButtonPress: function() {
+    ActionSheetIOS.showShareActionSheetWithOptions({
+      url: 'https://code.facebook.com',
+      message: 'message to go with the shared url',
+      subject: 'a subject to go in the email heading',
+      excludedActivityTypes: [
+        'com.apple.UIKit.activity.PostToTwitter'
+      ]
+    },
+    (error) => {
+      console.error(error);
+    },
+    (success, method) => {
+      var text;
+      if (success) {
+        text = `Shared via ${method}`;
+      } else {
+        text = 'You didn\'t share';
+      }
+      this.setState({text});
+    });
   },
 
   _renderContent: function(category: string, title: ?string) {
@@ -79,7 +108,9 @@ var home = React.createClass({
             title: title,
             passProps: {
               filter: category,
-              user_code: this.state.user_code}
+              user_code: this.state.user_code},
+              rightButtonIcon: this.state.shareIcon,
+              onRightButtonPress: this.onShareButtonPress
           }}
         />
       );

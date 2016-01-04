@@ -9,17 +9,12 @@ var Header = require('./../common/header');
 var Button = require('react-native-button');
 var Icon = require("react-native-vector-icons/FontAwesome");
 var Modal = require('react-native-modalbox');
+var commonAPI = require('../common/commonAPI');
+var _ = require('underscore');
+
 
 var Dimensions = require('Dimensions');
 var windowSize = Dimensions.get('window');
-
-var todoDemo = {
-  title:'NHK：对应邮件转送bug',
-  content:"bug再现:"+
-  "1.大发大水发斯蒂芬 2.嘎嘎大咖飒飒的 3.哈哈几节课",
-  deadline:'2015-12-25 12:00',
-  remindDate:'2015-12-24 8:00',
-};
 
 var {
   AppRegistry,
@@ -53,31 +48,85 @@ module.exports = React.createClass({
   
   getInitialState: function() {
     this.state = {
-      isModalOpen: false
+      isModalOpen: false,
     };
+
     return {
+      id: '',
       title: '',
       content: '',
       deadline:'',
       timeZoneOffsetInHours: this.props.timeZoneOffsetInHours,
       remindDate: '',
       selectDate: this.props.date,
+      status:'',
       importance:'',
       carMake: 'amc',
       modelIndex: 0,
       user_pass: '',
       isOpen: false,
       isDisabled: false,
+      loaded: false,
       modalType:'',
     }
+  },
+  componentWillMount: function() {
+    this.getTodoAPI();
+  },
+
+  getTodoAPI: function() {
+    var user_code = this.props.user_code;
+    var task_code = this.props.task_code;
+    var tempThis = this;
+
+    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents?task_code=' + task_code, {
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': commonAPI.make_base_auth('b_wang', 'b_wang')
+      }
+    }).then(
+      function(response) {
+        if (response.status === 401) {
+          AlertIOS.alert("Sm＠rtDB認証失敗しまいました！");
+        }
+        if (response.status === 200) {
+          var result = JSON.parse(response._bodyText);
+          result = commonAPI.objToArray(result.document);
+          var task = commonAPI.createTask(result);
+        
+          tempThis.setState({id:task.task_code});
+          tempThis.setState({title:task.task_title});
+          tempThis.setState({content:task.task_body});
+          tempThis.setState({deadline:(new Date(task.endDate))});
+          tempThis.setState({remindDate:(new Date(task.remindDate))});
+          if (task.task_status.id) {
+            tempThis.setState({status:parseInt(task.task_status.id)});
+          };
+          if (task.task_level.id) {
+            tempThis.setState({importance:parseInt(task.task_level.id)});
+            tempThis.setState({modelIndex:parseInt(task.task_level.id)});
+          };
+
+          tempThis.setState({
+            loaded: true
+          });
+          //tempThis.render();
+
+        }
+      }
+    )
+    .done();
   },
 
   openModalDeadline: function(id) {
     this.setState({modalType: 1});
+    this.setState({selectDate:this.state.deadline});
     this.refs.modal.open();
   },
   openModalRemind: function(id) {
     this.setState({modalType: 2});
+    this.setState({selectDate:this.state.remindDate});
     this.refs.modal.open();
   },
   openModalImportance: function(id) {
@@ -90,11 +139,26 @@ module.exports = React.createClass({
   onDateChange: function(date) {       
     this.setState({selectDate: date});
   },
-  // onDateChange: function(date) {
-  //   this.setState({date: date});
-  // },
+
+  /**
+   * 数据等待画面
+   * added by ql_wu
+   */
+  renderLoadingView: function() {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>
+          Loading……
+        </Text>
+      </View>
+    );
+  },
 
   render: function() {
+    if(!this.state.loaded){
+      return this.renderLoadingView();
+    }
+    console.log(this.state);
     var make = CAR_MAKES_AND_MODELS[this.state.carMake];
     return (
       <View style={styles.container}>
@@ -105,7 +169,7 @@ module.exports = React.createClass({
           autoCapitalize={'none'}
           keyboardType={'default'}
           
-          defaultValue={todoDemo.title}
+          defaultValue={this.state.title}
           onChangeText={(text) => this.setState({title: text})}
         />
         <View style={styles.separator} />
@@ -118,22 +182,22 @@ module.exports = React.createClass({
           clearButtonMode={'always'}
           keyboardType={'default'}
           multiline={true}
-          defaultValue={todoDemo.content}
+          defaultValue={this.state.content}
           onChangeText={(text) => this.setState({content: text})}
         />
         <View style={styles.separator} />
 
         <View style={styles.buttons}>
           <TouchableHighlight onPress={this.openModalDeadline} activeOpacity={0.4} underlayColor="#f8f8ff">
-            <Icon name="calendar" style={styles.iconButton} size={20} />
+            <Icon name={this.state.deadline == 0 ? "calendar-o" : "calendar"} style={styles.iconButton} size={20} />
           </TouchableHighlight>
 
           <TouchableHighlight onPress={this.openModalRemind} activeOpacity={0.4} underlayColor="#f8f8ff">
-            <Icon name="bell-o" style={styles.iconButton} size={20} />
+            <Icon name={this.state.remindDate == 0 ? "bell-o" : "bell"} style={styles.iconButton} size={20} />
           </TouchableHighlight>
 
           <TouchableHighlight onPress={this.openModalImportance} activeOpacity={0.4} underlayColor="#f8f8ff">
-            <Icon name="flag-o" style={styles.iconButton} size={20} />
+            <Icon name={this.state.importance == 0 ? "flag-o" : "flag"} style={styles.iconButton} size={20} />
           </TouchableHighlight>
 
         </View>
@@ -157,7 +221,7 @@ module.exports = React.createClass({
           <Button
           style={styles.update}
           styleDisabled={{color: 'red'}}
-          onPress={this.take}
+          onPress={this.finish}
           >
             完了
           </Button>
@@ -235,14 +299,17 @@ module.exports = React.createClass({
     this.refs.modal2.close();   
   },
 
-  addTodo: function() {
-    var title = this.state.title;
-    var content = this.state.content;
-    var deadline = this.state.deadline;
-    var remindDate = this.state.remindDate;
+  update: function() {
 
+  },
 
-  }
+  take: function() {
+
+  },
+
+  finish: function() {
+
+  },
 });
 
 var　DatePicker = React.createClass({
