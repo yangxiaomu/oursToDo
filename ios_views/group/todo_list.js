@@ -197,7 +197,8 @@ var todoList= React.createClass({
       onLeftButtonPress: () => this.props.navigator.pop(),
       passProps: {
         text: 'This page has an icon for the right button in the nav bar',
-        task_code: id
+        task_code: id,
+        user_code: this.state.user_code,
       }
     });
   },

@@ -25,6 +25,7 @@ var {
   TextInput,
   PickerIOS,
   DatePickerIOS,
+  AlertIOS,
   TouchableHighlight
 } = React;
 
@@ -68,6 +69,7 @@ module.exports = React.createClass({
       isDisabled: false,
       loaded: false,
       modalType:'',
+      changeFlag:0,
     }
   },
   componentWillMount: function() {
@@ -95,15 +97,25 @@ module.exports = React.createClass({
           result = commonAPI.objToArray(result.document);
           var task = commonAPI.createTask(result);
         
-          tempThis.setState({id:task.task_code});
+          //tempThis.setState({id:task.task_code});
+          tempThis.setState({id:task.record_id});
+
           tempThis.setState({title:task.task_title});
           tempThis.setState({content:task.task_body});
-          tempThis.setState({deadline:(new Date(task.endDate))});
-          tempThis.setState({remindDate:(new Date(task.remindDate))});
-          if (task.task_status.id) {
+          if (task.endDate) {
+            tempThis.setState({deadline:(new Date(task.endDate))});
+          } else {
+            tempThis.setState({deadline:'0'});
+          }
+          if (task.remindDate) {
+            tempThis.setState({remindDate:(new Date(task.remindDate))});
+          } else {
+            tempThis.setState({remindDate:'0'});
+          }
+          if (!_.isUndefined(task.task_status)) {
             tempThis.setState({status:parseInt(task.task_status.id)});
           };
-          if (task.task_level.id) {
+          if (!_.isUndefined(task.task_level)) {
             tempThis.setState({importance:parseInt(task.task_level.id)});
             tempThis.setState({modelIndex:parseInt(task.task_level.id)});
           };
@@ -111,7 +123,6 @@ module.exports = React.createClass({
           tempThis.setState({
             loaded: true
           });
-          //tempThis.render();
 
         }
       }
@@ -158,7 +169,6 @@ module.exports = React.createClass({
     if(!this.state.loaded){
       return this.renderLoadingView();
     }
-    console.log(this.state);
     var make = CAR_MAKES_AND_MODELS[this.state.carMake];
     return (
       <View style={styles.container}>
@@ -170,7 +180,11 @@ module.exports = React.createClass({
           keyboardType={'default'}
           
           defaultValue={this.state.title}
-          onChangeText={(text) => this.setState({title: text})}
+          onChangeText={(text) => {
+                                  this.setState({title: text});
+                                  this.setState({changeFlag:1});
+                                  }
+                        }
         />
         <View style={styles.separator} />
         
@@ -183,7 +197,11 @@ module.exports = React.createClass({
           keyboardType={'default'}
           multiline={true}
           defaultValue={this.state.content}
-          onChangeText={(text) => this.setState({content: text})}
+          onChangeText={(text) => {
+                                  this.setState({content: text});
+                                  this.setState({changeFlag:1});
+                                  }
+                                }
         />
         <View style={styles.separator} />
 
@@ -206,7 +224,7 @@ module.exports = React.createClass({
         <View style={styles.buttons}>
           <Button
           style={styles.update}
-          styleDisabled={{color: 'white'}}
+          styleDisabled={{color: 'whitea'}}
           onPress={this.update}
           >
             更新
@@ -279,6 +297,7 @@ module.exports = React.createClass({
     } else {
       this.setState({remindDate: this.state.selectDate});
     };
+    this.setState({changeFlag:1});
     this.refs.modal.close();
   },
   deleteDeadline: function() {
@@ -289,6 +308,7 @@ module.exports = React.createClass({
     };
     
     this.setState({selectDate: this.props.date});
+    this.setState({changeFlag:1});
 
     this.refs.modal.close();
     this.render();
@@ -296,20 +316,221 @@ module.exports = React.createClass({
 
   setImprotance: function() {
     this.setState({importance:this.state.modelIndex});
+    this.setState({changeFlag:1});
     this.refs.modal2.close();   
   },
 
   update: function() {
-
+    this.updateTask(1);
   },
 
   take: function() {
-
+    this.updateTask(2);
   },
 
   finish: function() {
+    this.updateTask(3);
+  },
+
+  updateTask:function(type) {
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        var csrfToken = JSON.parse(request.responseText).csrfToken;
+        var user_code = this.props.user_code;
+        var record_id = this.props.task_code;
+        request = null;
+        // if (1 == type) {
+        //   // 内容更新
+        //   this._udpateTask1(csrfToken, user_code, record_id);
+        // } else if (2 == type) {
+        //   // 担当者更新
+        //   this._udpateTask2(csrfToken, user_code, record_id);
+        // } else if (3 == type) {
+        //   // todo状态更新
+        //   this._udpateTask3(csrfToken, user_code, record_id);
+        // }
+        this._udpateTask(csrfToken, user_code, record_id, type);
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
 
   },
+  
+  _udpateTask: function(csrfToken, user_code, record_id, type) {
+    var bodyObj;
+
+    if (1 == type) {
+      this.setState({
+        loaded: false
+      });
+
+      var title = this.state.title;
+      var content = this.state.content;
+      var deadline = this.state.deadline;
+      var remindDate = this.state.remindDate;
+      var importance = this.state.importance;
+
+      bodyObj = "?_method=PUT&csrfToken=" + csrfToken + "&task_title=" + title + "&task_body=" + content + "&task_status=2";
+      if(deadline != "0") {
+        var year = deadline.getFullYear();
+        var month = deadline.getMonth() + 1;
+        var day = deadline.getDate();
+        var endDate = year + "-" + month + "-" + day;
+        bodyObj += "&endDate=" + endDate;
+      }
+      if(remindDate != "0") {
+        var year = remindDate.getFullYear();
+        var month = remindDate.getMonth() + 1;
+        var day = remindDate.getDate();
+        var endDate = year + "-" + month + "-" + day;
+        var hour = remindDate.getHours();
+        var minute = remindDate.getMinutes();
+        var remindDate = endDate + "T" + hour + ":" + minute + ":" + "01";
+        bodyObj += "&remindDate=" + remindDate;
+      }
+      if(importance) {
+        bodyObj += "&task_level=" + importance;
+      }
+    } else if (2 == type) {
+      bodyObj = "?user_code=" + user_code + "&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000";
+    } else if (3 == type) {
+      bodyObj = "?task_status=1&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000";
+    };
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        if (1 == type) {
+          this.setState({
+            loaded: true
+          });
+        } else {
+          this.props.navigator.pop();
+        }
+        
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + bodyObj);    
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
+
+  },
+  // 内容更新
+  _udpateTask1: function(csrfToken, user_code, record_id) {
+    this.setState({
+      loaded: false
+    });
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        this.setState({
+          loaded: true
+        });
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    var title = this.state.title;
+    var content = this.state.content;
+    var deadline = this.state.deadline;
+    var remindDate = this.state.remindDate;
+    var importance = this.state.importance;
+
+    var bodyObj = "?_method=PUT&csrfToken=" + csrfToken + "&task_title=" + title + "&task_body=" + content + "&task_status=2";
+    if(deadline != "0") {
+      var year = deadline.getFullYear();
+      var month = deadline.getMonth() + 1;
+      var day = deadline.getDate();
+      var endDate = year + "-" + month + "-" + day;
+      bodyObj += "&endDate=" + endDate;
+    }
+    if(remindDate != "0") {
+      var year = remindDate.getFullYear();
+      var month = remindDate.getMonth() + 1;
+      var day = remindDate.getDate();
+      var endDate = year + "-" + month + "-" + day;
+      var hour = remindDate.getHours();
+      var minute = remindDate.getMinutes();
+      var remindDate = endDate + "T" + hour + ":" + minute + ":" + "01";
+      bodyObj += "&remindDate=" + remindDate;
+    }
+    if(importance) {
+      bodyObj += "&task_level=" + importance;
+    }
+    //1
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + bodyObj);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
+  },
+
+  // 担当者更新
+  _udpateTask2: function(csrfToken, user_code, record_id) {
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        this.props.navigator.pop();
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + "?user_code=" + user_code + "&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000", true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
+
+  },
+
+  // todo状态更新
+  _udpateTask3: function(csrfToken, user_code, record_id) {
+
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = (e) => {
+      if (request.readyState !== 4) {
+        return;
+      }
+      if (request.status === 200) {
+        this.props.navigator.pop();
+      } else {
+        AlertIOS.alert("システムエラー");
+      }
+    };
+
+    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + "?task_status=1&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000", true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRequestHeader("Accept", "application/json");
+    request.send();
+    
+  }
+
 });
 
 var　DatePicker = React.createClass({
@@ -425,4 +646,8 @@ var styles = StyleSheet.create({
     height: 200,
     width: 320
   },
+  button: {
+    marginBottom: 10,
+    fontWeight: '500',
+  }
 });
