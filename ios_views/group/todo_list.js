@@ -79,7 +79,7 @@ var todoList= React.createClass({
     var group_code = this.props.group_code;
     var tempThis = this;
 
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents?group_code=' + group_code + "&sort=finish_date:DESC" + "&offset=0&limit=100000", {
+    fetch('http://10.2.8.118/hibiki/rest/1/binders/tasks/views/allData/documents?group_code=' + group_code + "&sort=finish_date:DESC" + "&offset=0&limit=100000", {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -288,7 +288,7 @@ var todoList= React.createClass({
       }
     };
 
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
+    request.open('POST', 'http://10.2.8.118/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/json");
     request.send();
@@ -309,7 +309,7 @@ var todoList= React.createClass({
       }
     };
 
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + record_id + "?user_code=" + this.state.user_code + "&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000", true);
+    request.open('POST', 'http://10.2.8.118/hibiki/rest/1/binders/tasks/documents/' + record_id + "?user_code=" + this.state.user_code + "&_method=PUT&csrfToken=" + csrfToken + "&offset=0&limit=100000", true);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/json");
     request.send();

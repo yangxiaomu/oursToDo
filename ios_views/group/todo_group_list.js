@@ -62,7 +62,7 @@ module.exports = React.createClass({
   getGroupByAPI: function() {
     var tempThis = this;
 
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents?members=' + this.state.user_code, {
+    fetch('http://10.2.8.118/hibiki/rest/1/binders/groups/views/allData/documents?members=' + this.state.user_code, {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ module.exports = React.createClass({
   },
 
   getGroupUsers: function(groups, tempThis) {
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/groups/views/allData/documents', {
+    fetch('http://10.2.8.118/hibiki/rest/1/binders/groups/views/allData/documents', {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ module.exports = React.createClass({
   },
 
   getGroupTasks: function(groups, tempThis) {
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents?offset=0&limit=1000000', {
+    fetch('http://10.2.8.118/hibiki/rest/1/binders/tasks/views/allData/documents?offset=0&limit=1000000', {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',

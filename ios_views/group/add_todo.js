@@ -234,7 +234,7 @@ module.exports = React.createClass({
       }
     };
 
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
+    request.open('POST', 'http://10.2.8.118/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/json");
     request.send();
@@ -284,7 +284,7 @@ module.exports = React.createClass({
     if(importance) {
       bodyObj += "&task_level=" + importance;
     }
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents' + bodyObj);
+    request.open('POST', 'http://10.2.8.118/hibiki/rest/1/binders/tasks/documents' + bodyObj);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/json");
     request.send();

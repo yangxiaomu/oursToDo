@@ -82,7 +82,7 @@ module.exports = React.createClass({
     var task_code = this.props.task_code;
     var tempThis = this;
 
-    fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/views/allData/documents?task_code=' + task_code, {
+    fetch('http://10.2.8.118/hibiki/rest/1/binders/tasks/views/allData/documents?task_code=' + task_code, {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -355,7 +355,7 @@ module.exports = React.createClass({
       }
     };
 
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
+    request.open('POST', 'http://10.2.8.118/hibiki/rest/1/session?loginid=b_wang&password=b_wang', true);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/json");
     request.send();
@@ -422,7 +422,7 @@ module.exports = React.createClass({
       }
     };
 
-    request.open('POST', 'http://agc.dreamarts.com.cn/hibiki/rest/1/binders/tasks/documents/' + this.state.id + bodyObj);    
+    request.open('POST', 'http://10.2.8.118/hibiki/rest/1/binders/tasks/documents/' + this.state.id + bodyObj);    
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Accept", "application/json");
     request.send();

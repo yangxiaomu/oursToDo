@@ -73,7 +73,7 @@ var login = React.createClass({
     if(user_code == "" || user_pass == "") {
       AlertIOS.alert("ユーザー・パスワードをご入力ください。");
     } else {
-      fetch('http://agc.dreamarts.com.cn/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
+      fetch('http://10.2.8.118/hibiki/rest/1/binders/users/views/allData/documents?user_code=' + user_code + "&user_pass=" + user_pass, {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
